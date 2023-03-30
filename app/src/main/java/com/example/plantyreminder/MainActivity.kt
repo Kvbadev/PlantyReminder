@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             PlantyReminderTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    PlantSlider(plants = SampleData.plantsSample)
+                    PlantSlider();
                 }
             }
         }

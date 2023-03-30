@@ -1,36 +1,32 @@
 package com.example.plantyreminder.views
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.api.ApiClient
 import com.example.plantyreminder.api.ApiClientFactory
-import com.example.plantyreminder.api.ApiInterface
 import com.example.plantyreminder.data.models.Plant
-import kotlinx.coroutines.*
-import retrofit2.Call
-import retrofit2.Response
-import javax.security.auth.callback.Callback
+import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
     private var apiClient: ApiClient;
+    private var plantsList = SnapshotStateList<Plant>();
 
     init {
         val apiClientFactory = ApiClientFactory();
         apiClient = apiClientFactory.createApiClient()
     }
 
-    fun getPlants() {
-
+    fun getPlants(): SnapshotStateList<Plant> {
         viewModelScope.launch {
-            try {
-                val data = apiClient.apiInterface.getAll();
-                data.indexOf("p");
-            } catch (e: Exception) {
-                print(e.message);
-            }
+            val allPlants = apiClient.getAll();
+
+            plantsList.clear();
+            plantsList.addAll(allPlants);
         }
 
+        return plantsList;
     }
 
 }
