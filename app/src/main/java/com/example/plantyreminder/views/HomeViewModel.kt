@@ -15,7 +15,7 @@ class HomeViewModel : ViewModel() {
 
     init {
         val apiClientFactory = ApiClientFactory();
-        apiClient = apiClientFactory.createApiClient()
+        apiClient = apiClientFactory.createGsonApiClient()
     }
 
     fun getPlants(): SnapshotStateList<Plant> {

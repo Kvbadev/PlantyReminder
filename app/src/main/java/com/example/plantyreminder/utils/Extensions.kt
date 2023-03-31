@@ -1,7 +1,7 @@
 package com.example.plantyreminder.utils
 
-import com.example.plantyreminder.api.ApiPlantObject
 import com.example.plantyreminder.api.PlantWateringTime
+import com.example.plantyreminder.api.dto.ApiPlantObject
 import com.example.plantyreminder.data.models.Plant
 
 fun ApiPlantObject.toPlant() = Plant(
