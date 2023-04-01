@@ -1,10 +1,8 @@
 package com.example.plantyreminder.data.models
 
-class Plant(
+data class Plant(
     val name: String,
     val waterSpan: PlantTimespan,
-    val temperature: Int,
-    val imageUrl: String
-) {
-
-}
+    val temperature: Int = 0,
+    val imageUrl: String?
+)

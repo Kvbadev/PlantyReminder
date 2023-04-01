@@ -1,15 +1,11 @@
 package com.example.plantyreminder.api
 
-import com.example.plantyreminder.data.models.Plant
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Response
+import com.example.plantyreminder.api.dto.ApiPlantObjectList
 import retrofit2.http.GET
-import retrofit2.http.Headers
+import retrofit2.http.Query
 
 interface ApiInterface {
 
-    @Headers("Content-Type: text/html")
-    @GET("api/species-list?page=1&key=sk-gYv86422f2f97f00e373")
-    suspend fun getAll(): String
+    @GET("api/species-list?page=1")
+    suspend fun getAll(@Query("q") query: String=""): ApiPlantObjectList
 }
