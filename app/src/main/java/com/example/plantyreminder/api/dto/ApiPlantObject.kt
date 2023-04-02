@@ -12,6 +12,10 @@ data class ApiPlantObject(
     @SerializedName("watering")
     val wateringSpan: String,
 
+    @SerializedName("sunlight")
+    val sunlight_preference: List<String>,
+
     @SerializedName("original_url")
     val imageUrl: String
+
 )
