@@ -13,5 +13,6 @@ fun ApiPlantObject.toPlant() = Plant(
       SunPreference.fromText(it)
     } else listOf(SunPreference.DEFAULT),
     imageUrl = imageUrl
+
 )
 

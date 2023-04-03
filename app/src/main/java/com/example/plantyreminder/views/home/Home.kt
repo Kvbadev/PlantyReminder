@@ -11,7 +11,7 @@ import com.example.plantyreminder.R
 fun Home() {
     val viewModel = HomeViewModel()
 
-    Surface(Modifier.fillMaxSize(), color = colorResource(id = R.color.gray_200)) {
+    Surface(Modifier.fillMaxSize()) {
         PlantSlider(plants = viewModel.getUserPlants())
     }
 

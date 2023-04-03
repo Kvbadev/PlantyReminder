@@ -5,5 +5,5 @@ data class Plant(
     val waterSpan: PlantTimespan,
     val temperature: Int = 0,
     val sunlight: List<SunPreference> = listOf(SunPreference.DEFAULT),
-    val imageUrl: String?
+    val imageUrl: String?,
 )

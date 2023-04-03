@@ -4,43 +4,52 @@
 
 package com.example.plantyreminder.views.home
 
-import android.media.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.example.plantyreminder.R
 import com.example.plantyreminder.data.models.Plant
 import com.example.plantyreminder.data.models.PlantTimespan
 import com.example.plantyreminder.data.models.SunPreference
 import java.util.*
-import kotlin.reflect.typeOf
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
-
     HorizontalPager(
         pageCount = plants.size, contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
     ) {
         PlantItem(plant = plants[it])
     }
 }
+
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
 fun PlantItem(plant: Plant) {
@@ -50,7 +59,7 @@ fun PlantItem(plant: Plant) {
         modifier = Modifier.padding(10.dp, 0.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(Modifier.height(400.dp)) {
+        Box(Modifier.height(900.pxToDp())) {
             AsyncImage(
                 model = plant.imageUrl,
                 contentDescription = "Plant's image",
@@ -83,12 +92,12 @@ fun PlantItem(plant: Plant) {
                 label = "Watering"
             )
             PlantItemMetric(
-                value = plant.sunlight,
-                label = "Sunlight"
+                value = plant.temperature.toString() + "°C",
+                label = "Temperature"
             )
             PlantItemMetric(
-                value = plant.temperature.toString()+"°C",
-                label = "Temperature"
+                value = plant.sunlight,
+                label = "Sunlight"
             )
         }
     }
@@ -98,6 +107,7 @@ fun PlantItem(plant: Plant) {
 inline fun <reified T> PlantItemMetric(value: T, label: String) {
     val context = LocalContext.current;
     val isText = T::class.java == String::class.java;
+    var popupControl by remember { mutableStateOf(false) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,15 +125,15 @@ inline fun <reified T> PlantItemMetric(value: T, label: String) {
             modifier = Modifier
                 .padding(if (isText) 8.dp else 6.dp)
         )
-
         if (isText && value is String)
             Text(
                 color = colorResource(id = R.color.gray_700),
                 text = value,
-                fontSize = 36.sp,
+                fontSize = 32.sp,
                 textAlign = TextAlign.Center,
             )
-        else if (value is List<*>)
+        else if (value is List<*>) {
+            val sunlight = value.first() as SunPreference
             Image(
                 painter = painterResource(
                     id = context.resources.getIdentifier(
@@ -133,7 +143,43 @@ inline fun <reified T> PlantItemMetric(value: T, label: String) {
                     )
                 ),
                 contentDescription = "Watering Span",
+                modifier = Modifier
+                    .clickable {
+                        popupControl = true
+                    }
+
             )
+            if (popupControl) {
+                Popup(
+                    offset = IntOffset(-8, 60),
+                    properties = PopupProperties(
+                        focusable = false,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = true,
+                        clippingEnabled = true,
+                    ),
+                    onDismissRequest = { popupControl = false },
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                colorResource(id = R.color.gray_200),
+                                RoundedCornerShape(20.dp)
+                            )
+                            .width(200.dp)
+                    ) {
+                        Text(
+                            text = sunlight.description,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .padding(6.dp),
+                            color = colorResource(id = R.color.black),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -142,7 +188,6 @@ inline fun <reified T> PlantItemMetric(value: T, label: String) {
 fun PlantSliderPreview() {
     PlantSlider(plants = SampleData.plantsSample)
 }
-
 
 object SampleData {
     val plantsSample = listOf(
