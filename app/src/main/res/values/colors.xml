@@ -8,5 +8,7 @@
     <color name="gray_200">#FFedecec</color>
     <color name="gray_500">#939393</color>
     <color name="gray_700">#5A5A5A</color>
+    <color name="blue_200">#5FB8D6</color>
+    <color name="blue_500">#3B7083</color>
     <color name="blue_700">#FF1f3c46</color>
 </resources>
