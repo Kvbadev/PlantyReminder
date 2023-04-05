@@ -2,8 +2,8 @@ package com.example.plantyreminder.utils
 
 import com.example.plantyreminder.api.PlantWateringTime
 import com.example.plantyreminder.api.dto.ApiPlantObject
-import com.example.plantyreminder.data.models.Plant
-import com.example.plantyreminder.data.models.SunPreference
+import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.data.SunPreference
 import kotlin.time.Duration
 
 fun ApiPlantObject.toPlant() = Plant(
@@ -15,6 +15,6 @@ fun ApiPlantObject.toPlant() = Plant(
     } else listOf(SunPreference.UNKNOWN),
     imageUrl = imageUrl,
     indoor = false,
-    age = Duration.ZERO
+    age = 0,
 )
 

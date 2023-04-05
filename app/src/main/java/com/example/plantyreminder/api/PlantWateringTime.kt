@@ -1,6 +1,6 @@
 package com.example.plantyreminder.api
 
-import com.example.plantyreminder.data.models.PlantTimespan
+import com.example.plantyreminder.data.PlantTimespan
 
  enum class PlantWateringTime(val span: PlantTimespan) {
     Frequent(PlantTimespan(1, 3)),

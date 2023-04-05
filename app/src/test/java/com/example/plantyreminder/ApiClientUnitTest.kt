@@ -2,10 +2,9 @@ package com.example.plantyreminder
 
 import com.example.plantyreminder.api.ApiClient
 import com.example.plantyreminder.api.ApiClientFactory
-import com.example.plantyreminder.data.models.Plant
+import com.example.plantyreminder.data.Plant
 import kotlinx.coroutines.runBlocking
 
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import retrofit2.HttpException

@@ -29,9 +29,9 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.example.plantyreminder.R
-import com.example.plantyreminder.data.models.Plant
-import com.example.plantyreminder.data.models.PlantTimespan
-import com.example.plantyreminder.data.models.SunPreference
+import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.data.PlantTimespan
+import com.example.plantyreminder.data.SunPreference
 import java.util.*
 import kotlin.time.Duration
 
@@ -82,7 +82,7 @@ fun PlantItem(plant: Plant) {
             )
             Spacer(modifier = Modifier.padding(8.dp))
             Text(
-                text = plant.age.inWholeDays.toString() + " days",
+                text = plant.age.toString() + " days",
                 modifier = Modifier
                     .padding(0.dp, 6.dp)
                     .weight(1f),
@@ -226,7 +226,7 @@ object SampleData {
             21,
             listOf(SunPreference.FULL_SHADE, SunPreference.FULL_SHADE),
             "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
-            age = Duration.parse("48h")
+            age = 48
         ), Plant(
             "Cleistocactus",
             PlantTimespan(2, 7),

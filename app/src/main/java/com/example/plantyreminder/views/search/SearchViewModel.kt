@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.api.ApiClient
 import com.example.plantyreminder.api.ApiClientFactory
-import com.example.plantyreminder.data.models.Plant
+import com.example.plantyreminder.data.Plant
 import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
