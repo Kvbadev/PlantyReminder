@@ -6,8 +6,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.utils.Converters
 
-@TypeConverters(Converters::class)
 @Database(entities = [Plant::class], version = 1)
 abstract class PlantDatabase : RoomDatabase() {
     abstract fun plantDao(): PlantDao

@@ -32,14 +32,16 @@ import com.example.plantyreminder.R
 import com.example.plantyreminder.data.Plant
 import com.example.plantyreminder.data.PlantTimespan
 import com.example.plantyreminder.data.SunPreference
+import com.example.plantyreminder.utils.getDays
 import java.util.*
 import kotlin.time.Duration
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
     HorizontalPager(
-        pageCount = plants.size, contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp),
-        modifier = Modifier.padding(16.dp, 0.dp)
+        pageCount = plants.size,
+        modifier = Modifier.padding(16.dp, 0.dp),
+        contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
     ) {
         PlantItem(plant = plants[it])
     }
@@ -56,40 +58,38 @@ fun PlantItem(plant: Plant) {
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth()
     ) {
-        AsyncImage(
-            model = plant.imageUrl,
-            contentDescription = "Plant's image",
-            Modifier
-                .clip(
-                    shape = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp),
-                )
+        Box(
+            modifier = Modifier
                 .height(900.pxToDp())
                 .fillMaxWidth()
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            AsyncImage(
+                model = plant.imageUrl,
+                contentDescription = "Plant's image",
+                Modifier
+                    .clip(shape = RoundedCornerShape(20.dp))
+                    .align(Alignment.Center)
+            )
+        }
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(0.dp, 10.dp)
         ) {
             Text(
                 text = plant.name,
-                Modifier
-                    .padding(0.dp, 6.dp)
-                    .weight(3f),
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 32.sp,
-                textAlign = TextAlign.Start
             )
-            Spacer(modifier = Modifier.padding(8.dp))
             Text(
-                text = plant.age.toString() + " days",
-                modifier = Modifier
-                    .padding(0.dp, 6.dp)
-                    .weight(1f),
+                text = plant.age.getDays().toString() + " days",
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 fontSize = 16.sp,
-                textAlign = TextAlign.End
             )
         }
         Row(
@@ -99,7 +99,7 @@ fun PlantItem(plant: Plant) {
                 .height(IntrinsicSize.Max),
         ) {
             PlantItemMetric(
-                value = plant.waterSpan.getEstimatedTimespan().toString() + " days",
+                value = plant.waterSpan.getTimespan() + " days",
                 label = "Watering",
                 Modifier.weight(1f)
             )
@@ -130,8 +130,9 @@ inline fun <reified T> PlantItemMetric(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .fillMaxHeight()
+            .padding(2.dp)
             .then(columnModifier),
+
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
@@ -141,37 +142,30 @@ inline fun <reified T> PlantItemMetric(
             color = colorResource(id = R.color.gray_500),
             textAlign = TextAlign.Start,
         )
-        Spacer(
-            modifier = Modifier
-                .padding(if (isText) 8.dp else 6.dp, 0.dp)
-        )
-        if (isText && value is String)
+        if (isText && value is String) {
+            Spacer(modifier = Modifier.padding(4.dp))
             Text(
                 color = colorResource(id = R.color.gray_700),
                 text = value,
-                fontSize = 30.sp,
+                fontSize = 24.sp,
                 textAlign = TextAlign.Center,
             )
+        }
         else if (value is List<*>) {
-            Box(
-                modifier = Modifier.fillMaxHeight(),
-            ) {
-                IconButton(
-                    onClick = { popupControl.value = true },
-                    modifier = Modifier.fillMaxHeight())
-                {
-                    Image(
-                        painter = painterResource(
-                            id = context.resources.getIdentifier(
-                                value.first().toString().lowercase(),
-                                "drawable",
-                                context.packageName
-                            )
-                        ),
-                        contentDescription = "Watering Span",
-                        modifier = Modifier.align(Alignment.BottomCenter)
-                    )
-                }
+            IconButton(
+                onClick = { popupControl.value = true },
+            )
+            {
+                Image(
+                    painter = painterResource(
+                        id = context.resources.getIdentifier(
+                            value.first().toString().lowercase(),
+                            "drawable",
+                            context.packageName
+                        )
+                    ),
+                    contentDescription = "Watering Span",
+                )
             }
             val sunlight = value.first() as SunPreference
             if (popupControl.value) {
@@ -191,6 +185,7 @@ fun DescriptionPopup(popupControl: MutableState<Boolean>, description: String) {
             clippingEnabled = true,
         ),
         onDismissRequest = { popupControl.value = false },
+        offset = IntOffset(-30, 60)
     ) {
         Box(
             modifier = Modifier
@@ -221,24 +216,29 @@ fun PlantSliderPreview() {
 object SampleData {
     val plantsSample = listOf(
         Plant(
-            "African Violet",
-            PlantTimespan(3, 6),
-            21,
-            listOf(SunPreference.FULL_SHADE, SunPreference.FULL_SHADE),
-            "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
-            age = 48
+            name = "African Violet",
+            waterSpan = PlantTimespan(3, 6),
+            temperature = 21,
+            sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.FULL_SHADE),
+            imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
+            age = 3600 * 24 * 12,
+            uid = 1
+
         ), Plant(
+            uid = 2,
             "Cleistocactus",
             PlantTimespan(2, 7),
             16,
             listOf(SunPreference.FULL_SUN, SunPreference.FULL_SHADE),
-            "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg"
+            "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg",
+            age = 3600 * 24 * 22,
         ), Plant(
+            uid = 3,
             "White Japanese Strawberry",
             PlantTimespan(6, 8),
             11,
             listOf(SunPreference.PART_SHADE),
-            "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg"
+            "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg",
         )
     )
 }

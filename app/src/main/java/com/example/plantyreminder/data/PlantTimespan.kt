@@ -3,9 +3,9 @@ package com.example.plantyreminder.data
 import androidx.room.TypeConverter
 import kotlin.math.max
 
-class PlantTimespan(internal val minTimespan: Int, internal val maxTimespan: Int) {
-    public fun getEstimatedTimespan(): Int {
-        return (maxTimespan + minTimespan) / 2
+class PlantTimespan(private val minTimespan: Int, private val maxTimespan: Int) {
+    public fun getTimespan(): String {
+        return String.format("%d-%d", minTimespan, maxTimespan)
     }
 
 

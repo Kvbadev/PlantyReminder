@@ -4,9 +4,10 @@ import com.example.plantyreminder.api.PlantWateringTime
 import com.example.plantyreminder.api.dto.ApiPlantObject
 import com.example.plantyreminder.data.Plant
 import com.example.plantyreminder.data.SunPreference
-import kotlin.time.Duration
+import java.util.*
 
 fun ApiPlantObject.toPlant() = Plant(
+    uid = 3,
     name = commonName,
     waterSpan = PlantWateringTime.valueOf(wateringSpan).span,
     temperature = 101,
@@ -15,6 +16,9 @@ fun ApiPlantObject.toPlant() = Plant(
     } else listOf(SunPreference.UNKNOWN),
     imageUrl = imageUrl,
     indoor = false,
-    age = 0,
+    age = 0
 )
+
+fun Long.getHours() = this / 3600
+fun Long.getDays() = getHours() / 24
 

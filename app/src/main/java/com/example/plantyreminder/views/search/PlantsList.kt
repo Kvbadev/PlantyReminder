@@ -31,7 +31,7 @@ fun PlantsList(
                     )
                     Spacer(Modifier.width(20.dp))
                     Text(
-                        text = "${it.waterSpan.getEstimatedTimespan()} days",
+                        text = "${it.waterSpan.getTimespan()} days",
                         Modifier.weight(1f),
                         textAlign = TextAlign.Center
                     )

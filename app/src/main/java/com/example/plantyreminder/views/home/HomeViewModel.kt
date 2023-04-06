@@ -1,16 +1,35 @@
 package com.example.plantyreminder.views.home
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
-import com.example.plantyreminder.MainActivity
+import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.Plant
 import com.example.plantyreminder.persistance.PlantsRepository
-import com.example.plantyreminder.persistance.PlantsRoomRepository
+import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    val repository: PlantsRepository = MainActivity.REPOSITORY_DEPENDENCY
+    private val repository: PlantsRepository,
+
 ) : ViewModel() {
     fun getUserPlants(): List<Plant> {
-//        return repository.getAll()
-        return SampleData.plantsSample;
+        val userPlants = SnapshotStateList<Plant>()
+
+        viewModelScope.launch {
+            repository.getAll().onSuccess {
+                userPlants.clear()
+                userPlants.addAll(it)
+            }
+        }
+
+        return userPlants
+    }
+    fun addUserPlants() {
+        viewModelScope.launch {
+            repository.insertAll(SampleData.plantsSample).onSuccess {
+                println("Data inserted!")
+            }.onFailure {
+                println(it.message)
+            }
+        }
     }
 }
