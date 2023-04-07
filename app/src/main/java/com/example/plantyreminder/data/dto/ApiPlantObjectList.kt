@@ -1,6 +1,5 @@
-package com.example.plantyreminder.api.dto
+package com.example.plantyreminder.data.dto
 
-import com.example.plantyreminder.data.Plant
 import com.google.gson.annotations.SerializedName
 
 //@JvmInline

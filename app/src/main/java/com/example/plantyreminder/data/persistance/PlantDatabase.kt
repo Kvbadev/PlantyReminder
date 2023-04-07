@@ -1,12 +1,10 @@
-package com.example.plantyreminder.persistance
+package com.example.plantyreminder.data.persistance
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.plantyreminder.data.Plant
-import com.example.plantyreminder.utils.Converters
+import com.example.plantyreminder.domain.Plant
 
 @Database(entities = [Plant::class], version = 1)
 abstract class PlantDatabase : RoomDatabase() {

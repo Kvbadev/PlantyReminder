@@ -1,8 +1,10 @@
-package com.example.plantyreminder.data
+package com.example.plantyreminder.domain
 
+import androidx.compose.ui.platform.LocalDensity
 import androidx.room.*
 import com.example.plantyreminder.utils.Converters
-import kotlin.time.Duration
+import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 @TypeConverters(Converters::class)
 @Entity
@@ -14,5 +16,5 @@ data class Plant(
     val sunlight: List<SunPreference> = listOf(SunPreference.UNKNOWN),
     @ColumnInfo("image_url") val imageUrl: String?,
     val indoor: Boolean = false,
-    var age: Long = 0,
+    @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now()
 )

@@ -1,7 +1,4 @@
-package com.example.plantyreminder.data
-
-import androidx.room.TypeConverter
-import kotlin.math.max
+package com.example.plantyreminder.domain
 
 class PlantTimespan(private val minTimespan: Int, private val maxTimespan: Int) {
     public fun getTimespan(): String {

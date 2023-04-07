@@ -1,4 +1,4 @@
-package com.example.plantyreminder.api
+package com.example.plantyreminder.data.api
 
 import com.example.plantyreminder.BuildConfig
 import okhttp3.Interceptor

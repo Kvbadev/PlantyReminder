@@ -1,7 +1,7 @@
 package com.example.plantyreminder.di
 
-import com.example.plantyreminder.persistance.PlantsRepository
-import com.example.plantyreminder.persistance.PlantsRoomRepository
+import com.example.plantyreminder.data.PlantsRepository
+import com.example.plantyreminder.data.persistance.PlantsRoomRepository
 import com.example.plantyreminder.views.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel

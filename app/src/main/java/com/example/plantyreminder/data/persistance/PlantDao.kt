@@ -1,7 +1,7 @@
-package com.example.plantyreminder.persistance
+package com.example.plantyreminder.data.persistance
 
 import androidx.room.*
-import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.domain.Plant
 
 @Dao
 interface PlantDao {
@@ -16,4 +16,8 @@ interface PlantDao {
 
     @Delete
     suspend fun delete(plant: Plant)
+
+    @Query("DELETE FROM plant")
+    suspend fun deleteAll()
+
 }

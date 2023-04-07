@@ -9,9 +9,6 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import com.example.plantyreminder.di.appModule
-import com.example.plantyreminder.persistance.PlantDatabase
-import com.example.plantyreminder.persistance.PlantsRepository
-import com.example.plantyreminder.persistance.PlantsRoomRepository
 import com.example.plantyreminder.ui.theme.PlantyReminderTheme
 import com.example.plantyreminder.views.home.Home
 import com.example.plantyreminder.views.home.HomeViewModel

@@ -1,8 +1,8 @@
 package com.example.plantyreminder
 
-import com.example.plantyreminder.api.ApiClient
-import com.example.plantyreminder.api.ApiClientFactory
-import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.data.api.ApiClient
+import com.example.plantyreminder.data.api.ApiClientFactory
+import com.example.plantyreminder.domain.Plant
 import kotlinx.coroutines.runBlocking
 
 import org.junit.jupiter.api.Assertions.*

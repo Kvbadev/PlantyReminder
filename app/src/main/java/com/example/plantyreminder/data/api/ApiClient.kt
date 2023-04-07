@@ -1,7 +1,7 @@
-package com.example.plantyreminder.api
+package com.example.plantyreminder.data.api
 
-import com.example.plantyreminder.api.dto.ApiPlantObjectList
-import com.example.plantyreminder.data.Plant
+import com.example.plantyreminder.data.dto.ApiPlantObjectList
+import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.utils.toPlant
 import okhttp3.OkHttpClient
 import retrofit2.Converter

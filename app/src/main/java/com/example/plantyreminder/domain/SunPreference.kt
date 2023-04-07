@@ -1,4 +1,4 @@
-package com.example.plantyreminder.data
+package com.example.plantyreminder.domain
 
 enum class SunPreference(val pref: String, val description: String) {
     FULL_SUN("full sun", "The plant should be in the sun for at least six hours per day"),

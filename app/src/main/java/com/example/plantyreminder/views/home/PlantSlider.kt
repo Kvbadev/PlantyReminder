@@ -29,12 +29,12 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
 import com.example.plantyreminder.R
-import com.example.plantyreminder.data.Plant
-import com.example.plantyreminder.data.PlantTimespan
-import com.example.plantyreminder.data.SunPreference
-import com.example.plantyreminder.utils.getDays
+import com.example.plantyreminder.domain.Plant
+import com.example.plantyreminder.domain.PlantTimespan
+import com.example.plantyreminder.domain.SunPreference
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.*
-import kotlin.time.Duration
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
@@ -86,7 +86,7 @@ fun PlantItem(plant: Plant) {
                 fontSize = 32.sp,
             )
             Text(
-                text = plant.age.getDays().toString() + " days",
+                text = ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now()).toString() + " days",
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 fontSize = 16.sp,
@@ -221,7 +221,7 @@ object SampleData {
             temperature = 21,
             sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.FULL_SHADE),
             imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
-            age = 3600 * 24 * 12,
+            createdAt = LocalDate.now().minusDays(7),
             uid = 1
 
         ), Plant(
@@ -231,7 +231,7 @@ object SampleData {
             16,
             listOf(SunPreference.FULL_SUN, SunPreference.FULL_SHADE),
             "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg",
-            age = 3600 * 24 * 22,
+            createdAt = LocalDate.now().minusDays(3),
         ), Plant(
             uid = 3,
             "White Japanese Strawberry",

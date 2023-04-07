@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Planty Reminder</string>
+    <string name="error_unknown">Something unexpected\'s happened</string>
 </resources>
