@@ -16,5 +16,6 @@ data class Plant(
     val sunlight: List<SunPreference> = listOf(SunPreference.UNKNOWN),
     @ColumnInfo("image_url") val imageUrl: String?,
     val indoor: Boolean = false,
-    @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now()
+    @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now(),
+    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now().plusDays(waterSpan.getEstimatedTimespan())
 )

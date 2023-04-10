@@ -16,18 +16,32 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.context.stopKoin
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        var isActivityVisible: Boolean = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isActivityVisible = !isActivityVisible
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isActivityVisible = !isActivityVisible
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        startKoin{
+        startKoin {
             androidLogger()
             androidContext(this@MainActivity)
             modules(appModule)
         }
-
-        val x: HomeViewModel by viewModel()
 
         setContent {
             PlantyReminderTheme {
@@ -40,5 +54,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopKoin()
     }
 }

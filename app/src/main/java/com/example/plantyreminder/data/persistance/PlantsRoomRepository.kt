@@ -23,6 +23,9 @@ class PlantsRoomRepository(
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
         } catch (e: Exception) {
+            val error = ErrorEntity.Default.Unknown
+            error.message = e.message.toString()
+
             SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }

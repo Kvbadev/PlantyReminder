@@ -7,9 +7,11 @@ package com.example.plantyreminder.views.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -32,23 +34,37 @@ import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantTimespan
 import com.example.plantyreminder.domain.SunPreference
+import java.security.cert.CertificateEncodingException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
-    HorizontalPager(
-        pageCount = plants.size,
-        modifier = Modifier.padding(16.dp, 0.dp),
-        contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
-    ) {
-        PlantItem(plant = plants[it])
+    if (plants.isEmpty()) {
+        Text(
+            text = "You have no plants yet!",
+            fontSize = 32.sp,
+            color = colorResource(id = R.color.blue_700),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textAlign = TextAlign.Center
+        )
+    } else {
+        HorizontalPager(
+            pageCount = plants.size,
+            modifier = Modifier.padding(16.dp, 0.dp),
+            contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
+        ) {
+            PlantItem(plant = plants[it])
+        }
     }
 }
 
 @Composable
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
+
 
 @Composable
 fun PlantItem(plant: Plant) {
@@ -86,7 +102,8 @@ fun PlantItem(plant: Plant) {
                 fontSize = 32.sp,
             )
             Text(
-                text = ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now()).toString() + " days",
+                text = ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())
+                    .toString() + " days",
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 fontSize = 16.sp,
@@ -114,6 +131,32 @@ fun PlantItem(plant: Plant) {
                 Modifier.weight(1f)
             )
         }
+        ItemNextWatering(plant.nextWatering)
+    }
+}
+
+@Composable
+fun ItemNextWatering(nextWatering: LocalDate) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(0.dp, 16.dp)
+            .border(2.dp, colorResource(id = R.color.gray_700), RoundedCornerShape(6.dp))
+            .padding(16.dp)
+    ) {
+
+        Text(
+            text = "Next watering in: ",
+            fontSize = 24.sp,
+            modifier = Modifier.weight(2f)
+        )
+        Text(
+            text = "${ChronoUnit.DAYS.between(LocalDate.now(), nextWatering)} days",
+            color = colorResource(id = R.color.green_500),
+            fontSize = 24.sp,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -150,8 +193,7 @@ inline fun <reified T> PlantItemMetric(
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
             )
-        }
-        else if (value is List<*>) {
+        } else if (value is List<*>) {
             IconButton(
                 onClick = { popupControl.value = true },
             )

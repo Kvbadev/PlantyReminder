@@ -46,19 +46,19 @@ class HomeViewModel(
                 println("plant table cleared!")
             }
             is SuspendedResult.Error -> {
-//                throw Exception(res..message)
+                throw Exception(res.error.message)
             }
         }
     }
 
 
-    fun addUserPlants() = viewModelScope.launch {
-        when (val res = repository.insertAll(SampleData.plantsSample)) {
+    fun addUserPlants(plants: List<Plant>) = viewModelScope.launch {
+        when (val res = repository.insertAll(plants)) {
             is SuspendedResult.Success -> {
-                println("Sample data inserted!")
+                println("Supplied data inserted!")
             }
             is SuspendedResult.Error -> {
-//                throw Exception(res..message)
+                throw Exception(res.error.message)
             }
         }
     }

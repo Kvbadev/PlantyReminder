@@ -12,21 +12,20 @@ package com.example.plantyreminder.domain
 //}
 //
 sealed interface ErrorEntity {
-    fun message(): String
+    var message: String;
 
-    enum class Default(private val message: String) : ErrorEntity {
-        Network("Network Error"),
+    enum class Default(override var message: String) : ErrorEntity {
         AccessDenied("Access Denied"),
         ServiceUnavailable("Service was unavailable"),
         Unknown("Error");
-
-        override fun message() = this.message
     }
 
-    enum class Database(private val message: String) : ErrorEntity {
+    enum class Database(override var message: String) : ErrorEntity {
         ConstraintException("Value was not unique"),
         CantOpenException("Could not open the database");
+    }
 
-        override fun message() = this.message
+    enum class Network(override var message: String) : ErrorEntity {
+        NoInternet("You have no internet connection")
     }
 }
