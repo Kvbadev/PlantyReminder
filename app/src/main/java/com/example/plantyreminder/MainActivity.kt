@@ -1,41 +1,63 @@
 package com.example.plantyreminder
 
-import PlantSlider
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.plantyreminder.data.models.Plant
-import com.example.plantyreminder.data.models.PlantTimespan
+import androidx.compose.ui.res.colorResource
+import com.example.plantyreminder.di.appModule
 import com.example.plantyreminder.ui.theme.PlantyReminderTheme
-import com.example.plantyreminder.views.HomeViewModel
-import kotlinx.coroutines.runBlocking
+import com.example.plantyreminder.views.home.Home
+import com.example.plantyreminder.views.home.HomeViewModel
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.core.context.stopKoin
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        var isActivityVisible: Boolean = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isActivityVisible = !isActivityVisible
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isActivityVisible = !isActivityVisible
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        startKoin {
+            androidLogger()
+            androidContext(this@MainActivity)
+            modules(appModule)
+        }
+
         setContent {
             PlantyReminderTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    PlantSlider();
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colorResource(id = R.color.white))
+                ) {
+                    Home();
                 }
             }
         }
     }
-}
 
-object SampleData {
-    val plantsSample = listOf(
-        Plant(
-            "African Violet", PlantTimespan(3, 6), 21, "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg"
-        ), Plant(
-            "Cleistocactus", PlantTimespan(2, 7), 16, "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg"
-        ), Plant(
-            "White Japanese Strawberry", PlantTimespan(6, 8), 11, "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg"
-        )
-    )
+    override fun onDestroy() {
+        super.onDestroy()
+        stopKoin()
+    }
 }

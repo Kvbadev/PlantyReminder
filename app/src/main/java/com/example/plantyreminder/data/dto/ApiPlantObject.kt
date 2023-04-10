@@ -1,4 +1,4 @@
-package com.example.plantyreminder.api.dto
+package com.example.plantyreminder.data.dto
 
 import com.google.gson.annotations.SerializedName
 
@@ -12,6 +12,10 @@ data class ApiPlantObject(
     @SerializedName("watering")
     val wateringSpan: String,
 
+    @SerializedName("sunlight")
+    val sunlight_preference: List<String>,
+
     @SerializedName("original_url")
     val imageUrl: String
+
 )
