@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 @TypeConverters(Converters::class)
 @Entity
 data class Plant(
-    @PrimaryKey val uid: Int,
+    @PrimaryKey val uid: Long,
     val name: String,
     @ColumnInfo("water_span") val waterSpan: PlantTimespan,
     val temperature: Int = 0,

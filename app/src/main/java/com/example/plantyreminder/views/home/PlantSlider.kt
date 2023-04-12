@@ -54,7 +54,6 @@ fun PlantSlider(plants: List<Plant>) {
     } else {
         HorizontalPager(
             pageCount = plants.size,
-            modifier = Modifier.padding(16.dp, 0.dp),
             contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
         ) {
             PlantItem(plant = plants[it])
@@ -72,7 +71,7 @@ fun PlantItem(plant: Plant) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth().padding(16.dp, 0.dp)
     ) {
         Box(
             modifier = Modifier
@@ -141,7 +140,7 @@ fun ItemNextWatering(nextWatering: LocalDate) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp, 16.dp)
-            .border(2.dp, colorResource(id = R.color.gray_700), RoundedCornerShape(6.dp))
+            .border(2.dp, colorResource(id = R.color.blue_700), RoundedCornerShape(6.dp))
             .padding(16.dp)
     ) {
 

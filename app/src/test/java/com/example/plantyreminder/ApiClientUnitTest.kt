@@ -10,11 +10,6 @@ import org.junit.jupiter.api.Test
 import retrofit2.HttpException
 import java.util.UUID
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 class ApiClientUnitTest {
     private val apiClientFactory: ApiClientFactory = ApiClientFactory()
 

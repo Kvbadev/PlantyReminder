@@ -44,8 +44,18 @@ class PlantsRoomRepository(
         }
     }
 
-    override fun insert(plant: Plant) {
-//        return database.plantDao().insert(plant)
+    override suspend fun insert(plant: Plant): SuspendedResult<Long> {
+        return try {
+            val res = database.plantDao().insert(plant)
+            SuspendedResult.Success(res)
+
+        } catch (e: SQLiteConstraintException) {
+            SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
+        } catch (e: SQLiteCantOpenDatabaseException) {
+            SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
+        } catch (e: Exception) {
+            SuspendedResult.Error(ErrorEntity.Default.Unknown)
+        }
     }
 
     override fun delete(plant: Plant) {
