@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -34,7 +33,6 @@ import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantTimespan
 import com.example.plantyreminder.domain.SunPreference
-import java.security.cert.CertificateEncodingException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -42,15 +40,25 @@ import java.util.*
 @Composable
 fun PlantSlider(plants: List<Plant>) {
     if (plants.isEmpty()) {
-        Text(
-            text = "You have no plants yet!",
-            fontSize = 32.sp,
-            color = colorResource(id = R.color.blue_700),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            textAlign = TextAlign.Center
-        )
+        Column(
+            Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.plant_image),
+                contentDescription = "Plant image",
+            )
+            Text(
+                text = "You have no plants yet!",
+                fontSize = 16.sp,
+                color = colorResource(id = R.color.gray_700),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                textAlign = TextAlign.Center
+            )
+        }
     } else {
         HorizontalPager(
             pageCount = plants.size,
@@ -71,7 +79,9 @@ fun PlantItem(plant: Plant) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().padding(16.dp, 0.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp, 0.dp)
     ) {
         Box(
             modifier = Modifier
@@ -252,6 +262,12 @@ fun DescriptionPopup(popupControl: MutableState<Boolean>, description: String) {
 @Composable
 fun PlantSliderPreview() {
     PlantSlider(plants = SampleData.plantsSample)
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PlantSliderPreviewEmpty() {
+    PlantSlider(plants = emptyList())
 }
 
 object SampleData {

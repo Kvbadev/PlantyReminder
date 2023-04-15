@@ -1,12 +1,10 @@
-package com.example.plantyreminder.data
-
-import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.SuspendedResult
+package com.example.plantyreminder.domain
 
 interface PlantsRepository {
     suspend fun getAll(): SuspendedResult<List<Plant>>;
+    suspend fun getPlant(uid: Long): SuspendedResult<Plant?>
     suspend fun insertAll(plants: List<Plant>): SuspendedResult<Unit>
     suspend fun insert(plant: Plant): SuspendedResult<Long>
-    fun delete(plant: Plant)
+    suspend fun delete(plant: Plant): SuspendedResult<Unit>
     suspend fun deleteAll(): SuspendedResult<Unit>
 }

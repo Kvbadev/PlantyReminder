@@ -14,7 +14,7 @@ class ApiClientUnitTest {
     private val apiClientFactory: ApiClientFactory = ApiClientFactory()
 
     @Test
-    fun `getAll is Correct Response`(): Unit = runBlocking {
+    fun getAllIsCorrectResponse(): Unit = runBlocking {
 
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
         val response = apiClient.getAll()
@@ -28,7 +28,7 @@ class ApiClientUnitTest {
     }
 
     @Test
-    fun `getAll Not Found Exception`(): Unit = runBlocking {
+    fun getAllNotFoundException(): Unit = runBlocking {
         val apiClient = apiClientFactory.createHttpErrorApiClient()
 
         apiClient.getAll().onFailure {
@@ -38,7 +38,7 @@ class ApiClientUnitTest {
     }
 
     @Test
-    fun `Get Empty List`(): Unit = runBlocking {
+    fun getEmptyList(): Unit = runBlocking {
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
         val response = apiClient.getAll(UUID.randomUUID().toString())
 
