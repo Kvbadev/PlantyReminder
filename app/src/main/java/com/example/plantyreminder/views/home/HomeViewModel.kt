@@ -1,21 +1,15 @@
 package com.example.plantyreminder.views.home
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.plantyreminder.R
-import com.example.plantyreminder.data.PlantsRepository
+import com.example.plantyreminder.domain.PlantsRepository
 import com.example.plantyreminder.domain.ErrorEntity
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.SuspendedResult
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.concurrent.atomic.AtomicBoolean
 
 class HomeViewModel(
     private val repository: PlantsRepository,

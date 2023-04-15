@@ -10,16 +10,11 @@ import org.junit.jupiter.api.Test
 import retrofit2.HttpException
 import java.util.UUID
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 class ApiClientUnitTest {
     private val apiClientFactory: ApiClientFactory = ApiClientFactory()
 
     @Test
-    fun `getAll is Correct Response`(): Unit = runBlocking {
+    fun getAllIsCorrectResponse(): Unit = runBlocking {
 
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
         val response = apiClient.getAll()
@@ -33,7 +28,7 @@ class ApiClientUnitTest {
     }
 
     @Test
-    fun `getAll Not Found Exception`(): Unit = runBlocking {
+    fun getAllNotFoundException(): Unit = runBlocking {
         val apiClient = apiClientFactory.createHttpErrorApiClient()
 
         apiClient.getAll().onFailure {
@@ -43,7 +38,7 @@ class ApiClientUnitTest {
     }
 
     @Test
-    fun `Get Empty List`(): Unit = runBlocking {
+    fun getEmptyList(): Unit = runBlocking {
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
         val response = apiClient.getAll(UUID.randomUUID().toString())
 

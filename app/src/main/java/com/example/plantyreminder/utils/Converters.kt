@@ -11,23 +11,29 @@ import kotlin.time.Duration
 
 class Converters {
     private val gsonConverter = Gson()
-    @TypeConverter
-    fun objectToJson(value: Any?): String = gsonConverter.toJson(value)
 
     @TypeConverter
-    fun localDateToJson(value: LocalDate): String {
-        val x = String.format("%s-%s-%s", value.dayOfMonth, value.monthValue, value.year)
-        return x;
-    }
+    fun objectToString(value: Any?): String = gsonConverter.toJson(value)
+
     @TypeConverter
-    fun plantTimespanFromString(timespan: String): PlantTimespan {
-        return gsonConverter.fromJson(timespan, PlantTimespan::class.java)
+    fun plantTimespanToString(value: PlantTimespan) = value.getTimespan()
+
+    @TypeConverter
+    fun localDateToString(value: LocalDate): String =
+        String.format("%s-%s-%s", value.dayOfMonth, value.monthValue, value.year)
+
+    @TypeConverter
+    fun plantTimespanFromString(timespan: String?): PlantTimespan {
+        val (min, max) = timespan!!.split('-').map {it.toInt()}
+        return PlantTimespan(min, max)
     }
+
     @TypeConverter
     fun sunPreferenceFromString(preference: String?): List<SunPreference> {
         val listType = object : TypeToken<List<SunPreference>>() {}.type
         return gsonConverter.fromJson(preference, listType)
     }
+
     @TypeConverter
     fun localDateFromString(date: String?): LocalDate {
         val (day, month, year) = date!!.split("-").map { it.toInt() }
