@@ -17,8 +17,12 @@ class HomeViewModel(
     private val _errorState: MutableStateFlow<ErrorEntity?> = MutableStateFlow(null)
     val errorState = _errorState.asStateFlow()
 
+    private val _loadingPlantsState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val loadingPlantsState = _loadingPlantsState.asStateFlow()
+
     fun getUserPlants(): List<Plant> {
         val plants: SnapshotStateList<Plant> = SnapshotStateList()
+        _loadingPlantsState.value = true
 
         viewModelScope.launch {
             when (val res = repository.getAll()) {
@@ -30,6 +34,7 @@ class HomeViewModel(
                     _errorState.value = res.error
                 }
             }
+            _loadingPlantsState.value = false
         }
         return plants
     }

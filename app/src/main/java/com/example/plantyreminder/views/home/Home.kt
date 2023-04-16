@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import com.example.plantyreminder.MainActivity
 import org.koin.androidx.compose.getViewModel
 import com.example.plantyreminder.R
@@ -27,6 +28,7 @@ fun Home() {
     val homeViewModel = getViewModel<HomeViewModel>()
     val plants = homeViewModel.getUserPlants()
     val errorState by homeViewModel.errorState.collectAsState()
+    val loadingPlantsState by homeViewModel.loadingPlantsState.collectAsState()
 //    homeViewModel.removeAllPlants()
 //    homeViewModel.addUserPlants(SampleData.plantsSample)
 
@@ -34,8 +36,20 @@ fun Home() {
         Modifier.fillMaxSize()
     ) {
         Column {
-
-            PlantSlider(plants)
+            if(loadingPlantsState) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                            .align(Alignment.Center),
+                        color = colorResource(
+                            id = R.color.blue_700
+                        )
+                    )
+                }
+            }
+            else PlantSlider(plants)
             if (errorState != null && MainActivity.isActivityVisible) {
                 Toast.makeText(LocalContext.current, errorState!!.message, Toast.LENGTH_LONG).show()
             }
