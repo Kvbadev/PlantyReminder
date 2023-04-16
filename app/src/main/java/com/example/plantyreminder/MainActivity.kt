@@ -13,8 +13,12 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import com.example.plantyreminder.di.appModule
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.ui.theme.PlantyReminderTheme
@@ -28,19 +32,6 @@ import org.koin.core.context.stopKoin
 
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        var isActivityVisible: Boolean = false
-    }
-
-    override fun onResume() {
-        super.onResume()
-        isActivityVisible = !isActivityVisible
-    }
-
-    override fun onPause() {
-        super.onPause()
-        isActivityVisible = !isActivityVisible
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,9 +54,7 @@ class MainActivity : ComponentActivity() {
                             AddPlant()
                         },
                         isFloatingActionButtonDocked = true,
-                        bottomBar = {
-                            BottomNavigation()
-                        }
+
                     ) { padding ->
                         Column {
                             Modifier.padding(padding)
@@ -77,29 +66,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        stopKoin()
-    }
-
-    @Composable
-    fun BottomNavigation() {
-        BottomAppBar(
-            backgroundColor = colorResource(id = R.color.green_500)
-        ) {
-            IconButton(onClick = { /* Check onClick */ }) {
-                Icon(Icons.Filled.Home, contentDescription = "", tint = Color.White)
-            }
-            IconButton(onClick = { /* Edit onClick */ }) {
-                Icon(
-                    Icons.Filled.Call, contentDescription = "", tint = Color.White
-                )
-            }
-            IconButton(onClick = { /* Delete onClick */ }) {
-                Icon(Icons.Filled.Search, contentDescription = "", tint = Color.White)
-            }
-        }
-    }
 
     @Composable
     fun AddPlant() {
@@ -113,4 +79,25 @@ class MainActivity : ComponentActivity() {
             Icon(Icons.Filled.Add, "")
         }
     }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopKoin()
+    }
+
+    companion object {
+        var isActivityVisible: Boolean = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        isActivityVisible = !isActivityVisible
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isActivityVisible = !isActivityVisible
+    }
+
 }

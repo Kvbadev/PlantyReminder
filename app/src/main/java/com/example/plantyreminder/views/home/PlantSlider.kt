@@ -11,16 +11,21 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +34,9 @@ import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
 import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantTimespan
@@ -89,13 +97,20 @@ fun PlantItem(plant: Plant) {
                 .fillMaxWidth()
         ) {
 
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = plant.imageUrl,
-                contentDescription = "Plant's image",
-                Modifier
-                    .clip(shape = RoundedCornerShape(20.dp))
+                contentDescription = plant.name,
+                modifier = Modifier
                     .align(Alignment.Center)
-            )
+                    .clip(RoundedCornerShape(8.dp))
+            ) {
+                val state = painter.state
+                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
+                    CircularProgressIndicator()
+                } else {
+                    SubcomposeAsyncImageContent()
+                }
+            }
         }
         Column(
             horizontalAlignment = Alignment.Start,
@@ -143,7 +158,6 @@ fun PlantItem(plant: Plant) {
         ItemNextWatering(plant.nextWatering)
     }
 }
-
 @Composable
 fun ItemNextWatering(nextWatering: LocalDate) {
     Row(
@@ -177,7 +191,6 @@ inline fun <reified T> PlantItemMetric(
 ) {
     val context = LocalContext.current
     val isText = T::class.java == String::class.java
-    val popupControl = remember { mutableStateOf(false) }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -203,26 +216,38 @@ inline fun <reified T> PlantItemMetric(
                 textAlign = TextAlign.Center,
             )
         } else if (value is List<*>) {
-            IconButton(
-                onClick = { popupControl.value = true },
-            )
-            {
-                Image(
-                    painter = painterResource(
-                        id = context.resources.getIdentifier(
-                            value.first().toString().lowercase(),
-                            "drawable",
-                            context.packageName
-                        )
-                    ),
-                    contentDescription = "Watering Span",
-                )
-            }
-            val sunlight = value.first() as SunPreference
-            if (popupControl.value) {
-                DescriptionPopup(popupControl, sunlight.description)
+            Row {
+                SunlightImageButton(value.first() as SunPreference)
+                if(value.size > 1) {
+                    Text(text = "/", fontSize = 34.sp)
+                    SunlightImageButton(value[1] as SunPreference)
+                }
             }
         }
+    }
+}
+
+@Composable
+fun SunlightImageButton(preference: SunPreference) {
+    val popupControl = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    IconButton(
+        onClick = {popupControl.value = true},
+    )
+    {
+        Image(
+            painter = painterResource(
+                id = context.resources.getIdentifier(
+                    preference.toString().lowercase(),
+                    "drawable",
+                    context.packageName
+                )
+            ),
+            contentDescription = "Watering Span",
+        )
+    }
+    if (popupControl.value) {
+        DescriptionPopup(popupControl, preference.description)
     }
 }
 
@@ -276,7 +301,7 @@ object SampleData {
             name = "African Violet",
             waterSpan = PlantTimespan(3, 6),
             temperature = 21,
-            sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.FULL_SHADE),
+            sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.PART_SHADE),
             imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
             createdAt = LocalDate.now().minusDays(7),
             uid = 1
