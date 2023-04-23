@@ -1,4 +1,4 @@
-package com.example.plantyreminder.views.search
+package com.example.plantyreminder.ui.search
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,13 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.plantyreminder.data.dto.PlantSearchResult
+import com.example.plantyreminder.domain.Plant
+import com.example.plantyreminder.ui.home.SampleData
 
 @Composable
 fun PlantsList(
-    plantsViewModel: SearchViewModel = SearchViewModel()
+    plants: List<PlantSearchResult>
 ) {
-    val plants = plantsViewModel.getPlants();
-
     Surface(
         modifier = Modifier
             .padding(all = 8.dp)
@@ -25,16 +26,18 @@ fun PlantsList(
         LazyColumn {
             items(plants) {
                 Row {
+                    it.names.forEach {
+                        Text(
+                            text = it, Modifier.weight(1f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     Text(
-                        text = it.name, Modifier.weight(1f),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(Modifier.width(20.dp))
-                    Text(
-                        text = "${it.waterSpan.getTimespan()} days",
+                        text = "${it.watering.getTimespan()} days",
                         Modifier.weight(1f),
                         textAlign = TextAlign.Center
                     )
+                    Spacer(Modifier.width(20.dp))
                 }
             }
         }
@@ -44,5 +47,5 @@ fun PlantsList(
 @Preview
 @Composable
 fun PlantSliderPreview() {
-    PlantsList();
+//    PlantsList(SampleData.plantsSample);
 }

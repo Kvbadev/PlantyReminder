@@ -1,8 +1,9 @@
 package com.example.plantyreminder.data.api
 
-import com.example.plantyreminder.data.dto.ApiPlantObjectList
-import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.utils.toPlant
+import com.example.plantyreminder.data.dto.PlantSearchResult
+import com.example.plantyreminder.domain.ErrorEntity
+import com.example.plantyreminder.domain.SuspendedResult
+import com.example.plantyreminder.utils.toPlantSearchResult
 import okhttp3.OkHttpClient
 import retrofit2.Converter
 import retrofit2.HttpException
@@ -26,18 +27,18 @@ class ApiClient(
         apiInterface = retrofit.create(ApiInterface::class.java)
     }
 
-    suspend fun getAll(predicate: String = ""): Result<List<Plant>> {
-        val data: ApiPlantObjectList?
-
-        try {
-            data = apiInterface.getAll(predicate)
+    suspend fun getAll(predicate: String = ""): SuspendedResult<List<PlantSearchResult>> {
+        return try {
+            val data = apiInterface.getAll(predicate).results.map {
+                it.toPlantSearchResult()
+            }
+            SuspendedResult.Success(data)
         } catch (e: HttpException) {
-            return Result.failure(e)
+            SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
+        } catch (e: Exception) {
+            val error = ErrorEntity.Default.Unknown
+            error.message = e.message!!
+            SuspendedResult.Error(error)
         }
-
-        return Result.success(data.results.map {
-            it.toPlant();
-        })
     }
-
 }

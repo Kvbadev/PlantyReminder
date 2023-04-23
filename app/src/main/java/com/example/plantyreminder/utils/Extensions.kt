@@ -1,23 +1,16 @@
 package com.example.plantyreminder.utils
 
 import com.example.plantyreminder.data.dto.ApiPlantObject
-import com.example.plantyreminder.domain.Plant
+import com.example.plantyreminder.data.dto.PlantSearchResult
 import com.example.plantyreminder.domain.PlantTimespan
-import com.example.plantyreminder.domain.SunPreference
 
-fun ApiPlantObject.toPlant() = Plant(
-    uid = 3,
-    name = commonName,
-    waterSpan = when (wateringSpan) {
-        "Frequent" -> PlantTimespan(1, 3)
-        "Average" -> PlantTimespan(3, 6)
-        "Minimal" -> PlantTimespan(6, 12)
-        else -> throw UnsupportedOperationException("Unsupported watering span")
+fun ApiPlantObject.toPlantSearchResult() = PlantSearchResult(
+    names = listOf(commonName) + otherNames + scientificNames,
+    watering = when (wateringSpan) {
+        "Average" -> PlantTimespan(1, 3)
+        "Frequent" -> PlantTimespan(4, 6)
+        "Minimal" -> PlantTimespan(7, 10)
+        else -> PlantTimespan(1, 3)
     },
-    temperature = 101,
-    sunlight = if (sunlight_preference.isNotEmpty()) sunlight_preference.map {
-        SunPreference.fromText(it)
-    } else listOf(SunPreference.UNKNOWN),
-    imageUrl = imageUrl,
-    indoor = false,
+    imageUrl = imageUrl ?: "",
 )

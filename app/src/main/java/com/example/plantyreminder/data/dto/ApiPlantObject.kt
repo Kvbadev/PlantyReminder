@@ -3,19 +3,18 @@ package com.example.plantyreminder.data.dto
 import com.google.gson.annotations.SerializedName
 
 data class ApiPlantObject(
-    @SerializedName("id")
-    val id: Int,
-
     @SerializedName("common_name")
     val commonName: String,
+
+    @SerializedName("other_name")
+    val otherNames: List<String>,
+
+    @SerializedName("scientific_name")
+    val scientificNames: List<String>,
 
     @SerializedName("watering")
     val wateringSpan: String,
 
-    @SerializedName("sunlight")
-    val sunlight_preference: List<String>,
-
     @SerializedName("original_url")
-    val imageUrl: String
-
+    val imageUrl: String?
 )
