@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
+import com.example.plantyreminder.utils.debounce
 import org.koin.androidx.compose.getViewModel
 
 
@@ -36,7 +37,8 @@ fun Search() {
                 CircularProgressIndicator(
                     Modifier
                         .width(100.dp)
-                        .height(100.dp),
+                        .height(100.dp)
+                        .align(Alignment.Center),
                     color = colorResource(
                         id = R.color.blue_700
                     )

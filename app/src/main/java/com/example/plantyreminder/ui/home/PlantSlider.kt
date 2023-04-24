@@ -33,6 +33,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.example.plantyreminder.R
+import com.example.plantyreminder.data.dto.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantTimespan
 import com.example.plantyreminder.domain.SunPreference
@@ -316,5 +317,10 @@ object SampleData {
             listOf(SunPreference.PART_SHADE),
             "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg",
         )
+    )
+    val searchResultSample: List<PlantSearchResult> = listOf(
+        PlantSearchResult(listOf("Cactus"), PlantTimespan(1,3), ""),
+        PlantSearchResult(listOf("Strawberry"), PlantTimespan(2,6), ""),
+        PlantSearchResult(listOf("Hibiscus"), PlantTimespan(6,10), ""),
     )
 }
