@@ -12,9 +12,11 @@ data class ApiPlantObject(
     @SerializedName("scientific_name")
     val scientificNames: List<String>,
 
-    @SerializedName("watering")
-    val wateringSpan: String,
+    @SerializedName("default_image")
+    val imageUrl: PlantImageUrl
+)
 
+data class PlantImageUrl(
     @SerializedName("original_url")
-    val imageUrl: String?
+    val url: String?
 )

@@ -1,8 +1,11 @@
 package com.example.plantyreminder
 
+import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.data.api.ApiClient
 import com.example.plantyreminder.data.api.ApiClientFactory
+import com.example.plantyreminder.domain.ErrorEntity
 import com.example.plantyreminder.domain.Plant
+import com.example.plantyreminder.domain.SuspendedResult
 import kotlinx.coroutines.runBlocking
 
 import org.junit.jupiter.api.Assertions.*
@@ -17,13 +20,12 @@ class ApiClientUnitTest {
     fun getAllIsCorrectResponse(): Unit = runBlocking {
 
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
-        val response = apiClient.getAll()
-
-        response.onSuccess {
-            assertNotEquals(0, it.size) {"Size of the list is 0"}
-            assertTrue(it.first()::class.java == Plant::class.java) {"Elements are not of type Plant"}
-        }.onFailure {
-            assertEquals(Exception::class.java, it::class.java) { "Returned value is not HttpException" }
+        when(val response = apiClient.getAll()) {
+            is SuspendedResult.Success -> {
+                assertNotEquals(0, response.data.size) {"Size of the list is 0"}
+                assertTrue(response.data.first()::class.java == PlantSearchResult::class.java) {"Elements are not of type Plant"}
+            }
+            is SuspendedResult.Error -> assertEquals(Exception::class.java, response.error ::class.java) { "Returned value is not HttpException" }
         }
     }
 
@@ -31,19 +33,15 @@ class ApiClientUnitTest {
     fun getAllNotFoundException(): Unit = runBlocking {
         val apiClient = apiClientFactory.createHttpErrorApiClient()
 
-        apiClient.getAll().onFailure {
-            assertEquals(HttpException::class.java, it::class.java) { "Returned value is not HttpException" }
-        }
+        val failedCall = apiClient.getAll() as SuspendedResult.Error
+        assert(failedCall.error is ErrorEntity.Network) { "Returned value is not network exception" }
 
     }
 
     @Test
     fun getEmptyList(): Unit = runBlocking {
         val apiClient: ApiClient = apiClientFactory.createGsonApiClient()
-        val response = apiClient.getAll(UUID.randomUUID().toString())
-
-        response.onSuccess {
-            assertTrue(it.isEmpty())
-        }
+        val response = apiClient.getAll(UUID.randomUUID().toString()) as SuspendedResult.Success
+        assertTrue(response.data.isEmpty())
     }
 }

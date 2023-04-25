@@ -1,6 +1,6 @@
 package com.example.plantyreminder.data.api
 
-import com.example.plantyreminder.data.dto.PlantSearchResult
+import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.ErrorEntity
 import com.example.plantyreminder.domain.SuspendedResult
 import com.example.plantyreminder.utils.toPlantSearchResult

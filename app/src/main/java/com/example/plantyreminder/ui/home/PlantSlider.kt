@@ -33,7 +33,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.example.plantyreminder.R
-import com.example.plantyreminder.data.dto.PlantSearchResult
+import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantTimespan
 import com.example.plantyreminder.domain.SunPreference
@@ -319,8 +319,8 @@ object SampleData {
         )
     )
     val searchResultSample: List<PlantSearchResult> = listOf(
-        PlantSearchResult(listOf("Cactus"), PlantTimespan(1,3), ""),
-        PlantSearchResult(listOf("Strawberry"), PlantTimespan(2,6), ""),
-        PlantSearchResult(listOf("Hibiscus"), PlantTimespan(6,10), ""),
+        PlantSearchResult(listOf("Cactus Cactus Cactus", "lksj lskdjfl lsdjfklsldf"), ""),
+        PlantSearchResult(listOf("Strawberry"), ""),
+        PlantSearchResult(listOf("Hibiscus"), ""),
     )
 }
