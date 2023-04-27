@@ -18,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
@@ -40,6 +41,7 @@ import com.example.plantyreminder.domain.SunPreference
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.math.absoluteValue
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
@@ -79,7 +81,8 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
 fun PlantItem(plant: Plant) {
-
+    val daysToWatering = ChronoUnit.DAYS.between(plant.nextWatering, LocalDate.now())
+        .toInt()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -98,15 +101,10 @@ fun PlantItem(plant: Plant) {
                 contentDescription = plant.name,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
-                    CircularProgressIndicator()
-                } else {
-                    SubcomposeAsyncImageContent()
-                }
-            }
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                loading = { CircularProgressIndicator() }
+            )
         }
         Column(
             horizontalAlignment = Alignment.Start,
@@ -122,8 +120,7 @@ fun PlantItem(plant: Plant) {
                 fontSize = 32.sp,
             )
             Text(
-                text = ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())
-                    .toString() + " days",
+                text = "${ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())} days",
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 fontSize = 16.sp,
@@ -151,30 +148,35 @@ fun PlantItem(plant: Plant) {
                 Modifier.weight(1f)
             )
         }
-        ItemNextWatering(plant.nextWatering)
+        ItemNextWatering(ChronoUnit.DAYS.between(LocalDate.now(), plant.nextWatering))
     }
 }
+
 @Composable
-fun ItemNextWatering(nextWatering: LocalDate) {
+fun ItemNextWatering(daysToWatering: Long) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp, 16.dp)
             .border(2.dp, colorResource(id = R.color.blue_700), RoundedCornerShape(6.dp))
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
         Text(
-            text = "Next watering in: ",
+            text = "Next watering: ",
             fontSize = 24.sp,
-            modifier = Modifier.weight(2f)
         )
         Text(
-            text = "${ChronoUnit.DAYS.between(LocalDate.now(), nextWatering)} days",
-            color = colorResource(id = R.color.green_500),
+            text = when {
+                daysToWatering > 0 -> "$daysToWatering days"
+                daysToWatering == 0L -> "Today"
+                else -> "${daysToWatering.absoluteValue} days ago!"
+            },
+            color = colorResource(id = if (daysToWatering > 0) R.color.blue_700 else R.color.red_500),
             fontSize = 24.sp,
             textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -213,7 +215,7 @@ inline fun <reified T> PlantItemMetric(
         } else if (value is List<*>) {
             Row {
                 SunlightImageButton(value.first() as SunPreference)
-                if(value.size > 1) {
+                if (value.size > 1) {
                     Text(text = "/", fontSize = 34.sp)
                     SunlightImageButton(value[1] as SunPreference)
                 }
@@ -227,7 +229,7 @@ fun SunlightImageButton(preference: SunPreference) {
     val popupControl = remember { mutableStateOf(false) }
     val context = LocalContext.current
     IconButton(
-        onClick = {popupControl.value = true},
+        onClick = { popupControl.value = true },
     )
     {
         Image(

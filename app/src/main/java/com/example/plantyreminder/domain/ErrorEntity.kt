@@ -1,16 +1,5 @@
 package com.example.plantyreminder.domain
 
-//sealed class ErrorEntity() {
-//    object Network : ErrorEntity()
-//    object AccessDenied : ErrorEntity()
-//    object ServiceUnavailable : ErrorEntity()
-//    sealed class DatabaseException : ErrorEntity() {
-//        object ConstraintException : DatabaseException()
-//        object CantOpenException: DatabaseException()
-//    }
-//    object Unknown : ErrorEntity()
-//}
-//
 sealed interface ErrorEntity {
     var message: String;
 

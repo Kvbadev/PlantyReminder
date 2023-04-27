@@ -1,5 +1,6 @@
 package com.example.plantyreminder.ui.search
 
+import android.media.ImageReader
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,16 +16,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import coil.request.ImageRequest
+import coil.transform.Transformation
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.ui.home.SampleData
 import com.example.plantyreminder.R
+import java.util.*
 
 @Composable
 fun PlantsList(
@@ -36,43 +45,54 @@ fun PlantsList(
                 Modifier
                     .padding(0.dp, 2.dp)
                     .border(2.dp, colorResource(id = R.color.green_700))
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                SubcomposeAsyncImage(
-                    model = it.imageUrl,
-                    contentDescription = it.names.first(),
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(8.dp)
-                        .height(80.dp)
-                        .clip(CircleShape)
-                ) {
-                    if (painter.state is AsyncImagePainter.State.Loading ||
-                        painter.state is AsyncImagePainter.State.Error
-                    ) {
-                        Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Photo")
-                    } else SubcomposeAsyncImageContent()
+                Box(Modifier.weight(2f).padding(4.dp, 2.dp)) {
+                    SubcomposeAsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(it.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = it.names.first(),
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(CircleShape),
+                        loading = {
+                            Box(Modifier.size(64.dp)) {
+                                CircularProgressIndicator(
+                                    Modifier
+                                        .align(Alignment.Center)
+                                        .size(32.dp)
+                                )
+                            }
+                        },
+                        contentScale = ContentScale.Crop
+                    )
                 }
                 Column(
-                    Modifier.weight(3f),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.weight(6f)
                 ) {
                     Text(
-                        it.names.first(),
+                        it.names.first().replaceFirstChar { it.uppercaseChar() },
                         color = colorResource(id = R.color.black),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    it.names.drop(1).forEach {
-                        Text(
-                            text = it,
-                            color = colorResource(id = R.color.blue_500),
-                            textAlign = TextAlign.Center
-                        )
-                    }
 
+                    Text(
+                        text = it.names.joinToString("\n"),
+                        color = colorResource(id = R.color.blue_500),
+                        fontSize = 10.sp,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
+
             }
         }
     }
