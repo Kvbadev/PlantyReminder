@@ -1,11 +1,15 @@
 package com.example.plantyreminder.ui.search
 
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,24 +19,45 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
+import com.example.plantyreminder.ui.home.SampleData
 import com.example.plantyreminder.utils.debounce
 import org.koin.androidx.compose.getViewModel
 
 
 @Composable
-fun Search() {
+fun Search(
+    onDetailsPopUp: () -> Unit,
+    onBackButton: () -> Unit
+) {
     val searchViewModel = getViewModel<SearchViewModel>()
     val results by searchViewModel.results.collectAsState()
     val errorState by searchViewModel.errorState.collectAsState()
     val loading by searchViewModel.loadingState.collectAsState()
 
-    Column {
-        SearchView(searchViewModel::getSearchResults)
-        if(loading) {
+    Column(Modifier.fillMaxSize()) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .width(IntrinsicSize.Max)
+                .height(IntrinsicSize.Max)
+        ) {
+            Box(Modifier.clickable {
+                onDetailsPopUp()
+            }.width(48.dp).fillMaxHeight()) {
+                Icon(
+                    Icons.Filled.ArrowBack, "",
+                    modifier = Modifier.align(Alignment.Center).size(32.dp)
+                )
+            }
+            SearchView(searchViewModel::getSearchResults)
+        }
+        if (loading) {
             Box(modifier = Modifier.fillMaxSize()) {
                 CircularProgressIndicator(
                     Modifier
@@ -44,14 +69,14 @@ fun Search() {
                     )
                 )
             }
-        } else PlantsList(plants = results)
+        } else PlantsList(plants = results, onDetailsPopUp = onDetailsPopUp)
     }
 
-        if (errorState != null && MainActivity.isActivityVisible) {
-            Toast.makeText(
-                LocalContext.current,
-                errorState!!.message,
-                Toast.LENGTH_LONG
+    if (errorState != null && MainActivity.isActivityVisible) {
+        Toast.makeText(
+            LocalContext.current,
+            errorState!!.message,
+            Toast.LENGTH_LONG
         ).show()
     }
 }
@@ -76,9 +101,9 @@ fun SearchView(onValueChange: (value: String) -> Unit) {
 
         },
         modifier = Modifier
+            .fillMaxWidth()
             .padding(10.dp)
             .border(2.dp, colorResource(id = R.color.green_700), RoundedCornerShape(12.dp))
-            .fillMaxWidth()
             .onFocusChanged {
                 isFocused.value = it.isFocused
             },
@@ -91,4 +116,10 @@ fun SearchView(onValueChange: (value: String) -> Unit) {
             focusedIndicatorColor = Color.Transparent,
         )
     )
+}
+
+@Preview
+@Composable
+fun SearchPreview() {
+    SearchView {}
 }

@@ -18,10 +18,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.plantyreminder.MainActivity
 import org.koin.androidx.compose.getViewModel
 import com.example.plantyreminder.R
-import com.example.plantyreminder.ui.PlantyScreen
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(onNavigateToSearch: () -> Unit) {
     val homeViewModel = getViewModel<HomeViewModel>()
     val errorState by homeViewModel.errorState.collectAsState()
     val loadingPlantsState by homeViewModel.loadingPlantsState.collectAsState()
@@ -31,7 +30,7 @@ fun Home(navController: NavController) {
         Modifier.fillMaxSize()
     ) {
         Scaffold(
-            floatingActionButton = { AddPlant(navController) },
+            floatingActionButton = { AddPlant(onNavigateToSearch) },
             isFloatingActionButtonDocked = true
         ) { padding ->
             Column(Modifier.padding(padding)) {
@@ -64,10 +63,10 @@ fun Home(navController: NavController) {
 }
 
 @Composable
-fun AddPlant(navController: NavController) {
+fun AddPlant(navigateToSearch: () -> Unit) {
     FloatingActionButton(
         onClick = {
-            navController.navigate(PlantyScreen.Add.name)
+            navigateToSearch()
         },
         backgroundColor = colorResource(id = R.color.green_700),
         contentColor = colorResource(id = R.color.white)

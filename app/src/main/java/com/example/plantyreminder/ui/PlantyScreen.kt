@@ -2,19 +2,11 @@ package com.example.plantyreminder.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -22,10 +14,9 @@ import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.home.Home
 import com.example.plantyreminder.ui.search.Search
 
-enum class PlantyScreen(@StringRes val title: Int) {
-    Home(title = R.string.app_name),
-    Add(title = R.string.add_plant),
-    Settings(title = R.string.settings)
+
+enum class PlantyScreen {
+    Home, Search, Details, Settings
 }
 
 
@@ -43,10 +34,15 @@ fun PlantyReminderApp() {
             startDestination = PlantyScreen.Home.name,
         ) {
             composable(PlantyScreen.Home.name) {
-                Home(navController)
+                Home {
+                    navController.navigate(PlantyScreen.Search.name)
+                }
             }
-            composable(PlantyScreen.Add.name) {
-                Search()
+            composable(PlantyScreen.Search.name) {
+                Search(
+                    { navController.navigate(PlantyScreen.Home.name) },
+                    { navController.navigate("${PlantyScreen.Details.name}/{plantId}") }
+                )
             }
         }
     }

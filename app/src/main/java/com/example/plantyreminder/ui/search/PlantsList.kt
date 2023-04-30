@@ -1,14 +1,11 @@
 package com.example.plantyreminder.ui.search
 
-import android.media.ImageReader
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -37,29 +34,35 @@ import java.util.*
 
 @Composable
 fun PlantsList(
-    plants: List<PlantSearchResult>
+    plants: List<PlantSearchResult>,
+    onDetailsPopUp: () -> Unit
 ) {
-    LazyColumn(Modifier.padding(8.dp)) {
-        items(plants) {
+    LazyColumn(Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)) {
+
+        items(plants) { searchResult ->
+            val itemName = searchResult.names.first().replaceFirstChar { it.uppercaseChar() }.trim()
+            val otherNames = searchResult.names.joinToString("\n")
+
             Row(
                 Modifier
-                    .padding(0.dp, 2.dp)
-                    .border(2.dp, colorResource(id = R.color.green_700))
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .clickable {
+                        onDetailsPopUp()
+                    }
+                    .fillMaxWidth()
+                    .padding(2.dp, 10.dp),
+            verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Box(Modifier.weight(2f).padding(4.dp, 2.dp)) {
+                Box(Modifier.weight(2f).padding(0.dp, 2.dp)) {
                     SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(it.imageUrl)
+                            .data(searchResult.imageUrl)
                             .crossfade(true)
                             .build(),
-                        contentDescription = it.names.first(),
+                        contentDescription = searchResult.names.first(),
                         modifier = Modifier
                             .size(64.dp)
-                            .clip(CircleShape),
+                            .align(Alignment.Center),
                         loading = {
                             Box(Modifier.size(64.dp)) {
                                 CircularProgressIndicator(
@@ -77,29 +80,22 @@ fun PlantsList(
                     modifier = Modifier.weight(6f)
                 ) {
                     Text(
-                        it.names.first().replaceFirstChar { it.uppercaseChar() },
+                        itemName,
                         color = colorResource(id = R.color.black),
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
 
                     Text(
-                        text = it.names.joinToString("\n"),
+                        text = otherNames,
                         color = colorResource(id = R.color.blue_500),
                         fontSize = 10.sp,
                         maxLines = 4,
-                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PlantSliderPreview() {
-    PlantsList(SampleData.searchResultSample);
 }
