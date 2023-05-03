@@ -1,23 +1,27 @@
 package com.example.plantyreminder.utils
 
+import com.example.plantyreminder.data.dto.ApiSearchResultObject
+import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.data.dto.ApiPlantObject
 import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.PlantTimespan
+import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SunPreference
 
+fun ApiSearchResultObject.toPlantSearchResult() = PlantSearchResult(
+    id = id,
+    names = listOf(commonName) + otherNames + scientificNames,
+    imageUrl = imageUrl.url ?: "",
+)
+
 fun ApiPlantObject.toPlant() = Plant(
-    uid = 3,
-    name = commonName,
-    waterSpan = when (wateringSpan) {
-        "Frequent" -> PlantTimespan(1, 3)
-        "Average" -> PlantTimespan(3, 6)
-        "Minimal" -> PlantTimespan(6, 12)
-        else -> throw UnsupportedOperationException("Unsupported watering span")
-    },
-    temperature = 101,
-    sunlight = if (sunlight_preference.isNotEmpty()) sunlight_preference.map {
-        SunPreference.fromText(it)
-    } else listOf(SunPreference.UNKNOWN),
-    imageUrl = imageUrl,
-    indoor = false,
+    name = commonName ?: "",
+    description = description ?: "",
+    waterSpan = PlantWateringSpan.fromText(watering?.lowercase() ?: "AVERAGE"),
+    sunlight = sunlight.map {SunPreference.fromText(it)},
+    imageUrl = imageUrl.url,
+    indoor = indoor,
+    family = family,
+    origin = "${origin.first()}, ${origin.elementAtOrNull(1) ?: ""}",
+    type = type,
+    edible = edibleFruit
 )

@@ -2,7 +2,7 @@
     ExperimentalFoundationApi::class
 )
 
-package com.example.plantyreminder.views.home
+package com.example.plantyreminder.ui.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -18,14 +18,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,17 +30,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
 import com.example.plantyreminder.R
+import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.PlantTimespan
+import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SunPreference
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
+import kotlin.math.absoluteValue
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
@@ -83,7 +79,6 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
 fun PlantItem(plant: Plant) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -102,15 +97,10 @@ fun PlantItem(plant: Plant) {
                 contentDescription = plant.name,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Loading || state is AsyncImagePainter.State.Error) {
-                    CircularProgressIndicator()
-                } else {
-                    SubcomposeAsyncImageContent()
-                }
-            }
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                loading = { CircularProgressIndicator() }
+            )
         }
         Column(
             horizontalAlignment = Alignment.Start,
@@ -126,8 +116,7 @@ fun PlantItem(plant: Plant) {
                 fontSize = 32.sp,
             )
             Text(
-                text = ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())
-                    .toString() + " days",
+                text = "${ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())} days",
                 color = colorResource(id = R.color.blue_700),
                 maxLines = 1,
                 fontSize = 16.sp,
@@ -140,13 +129,13 @@ fun PlantItem(plant: Plant) {
                 .height(IntrinsicSize.Max),
         ) {
             PlantItemMetric(
-                value = plant.waterSpan.getTimespan() + " days",
+                value = "${plant.waterSpan.getEstimatedTimespan()} days",
                 label = "Watering",
                 Modifier.weight(1f)
             )
             PlantItemMetric(
-                value = plant.temperature.toString() + "°C",
-                label = "Temperature",
+                value = plant.origin,
+                label = "Origin",
                 Modifier.weight(1f)
             )
             PlantItemMetric(
@@ -155,30 +144,35 @@ fun PlantItem(plant: Plant) {
                 Modifier.weight(1f)
             )
         }
-        ItemNextWatering(plant.nextWatering)
+        ItemNextWatering(ChronoUnit.DAYS.between(LocalDate.now(), plant.nextWatering))
     }
 }
+
 @Composable
-fun ItemNextWatering(nextWatering: LocalDate) {
+fun ItemNextWatering(daysToWatering: Long) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp, 16.dp)
             .border(2.dp, colorResource(id = R.color.blue_700), RoundedCornerShape(6.dp))
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
         Text(
-            text = "Next watering in: ",
+            text = "Next watering: ",
             fontSize = 24.sp,
-            modifier = Modifier.weight(2f)
         )
         Text(
-            text = "${ChronoUnit.DAYS.between(LocalDate.now(), nextWatering)} days",
-            color = colorResource(id = R.color.green_500),
+            text = when {
+                daysToWatering > 0 -> "$daysToWatering days"
+                daysToWatering == 0L -> "Today"
+                else -> "${daysToWatering.absoluteValue} days ago!"
+            },
+            color = colorResource(id = if (daysToWatering > 0) R.color.blue_700 else R.color.red_500),
             fontSize = 24.sp,
             textAlign = TextAlign.End,
-            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -189,7 +183,6 @@ inline fun <reified T> PlantItemMetric(
     label: String,
     columnModifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     val isText = T::class.java == String::class.java
 
     Column(
@@ -218,7 +211,7 @@ inline fun <reified T> PlantItemMetric(
         } else if (value is List<*>) {
             Row {
                 SunlightImageButton(value.first() as SunPreference)
-                if(value.size > 1) {
+                if (value.size > 1) {
                     Text(text = "/", fontSize = 34.sp)
                     SunlightImageButton(value[1] as SunPreference)
                 }
@@ -232,7 +225,7 @@ fun SunlightImageButton(preference: SunPreference) {
     val popupControl = remember { mutableStateOf(false) }
     val context = LocalContext.current
     IconButton(
-        onClick = {popupControl.value = true},
+        onClick = { popupControl.value = true },
     )
     {
         Image(
@@ -298,29 +291,34 @@ fun PlantSliderPreviewEmpty() {
 object SampleData {
     val plantsSample = listOf(
         Plant(
+            uid = 1,
             name = "African Violet",
-            waterSpan = PlantTimespan(3, 6),
-            temperature = 21,
+            "",
+            PlantWateringSpan.FREQUENT,
             sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.PART_SHADE),
             imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
             createdAt = LocalDate.now().minusDays(7),
-            uid = 1
 
         ), Plant(
             uid = 2,
             "Cleistocactus",
-            PlantTimespan(2, 7),
-            16,
+            "",
+            PlantWateringSpan.AVERAGE,
             listOf(SunPreference.FULL_SUN, SunPreference.FULL_SHADE),
             "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg",
             createdAt = LocalDate.now().minusDays(3),
         ), Plant(
             uid = 3,
             "White Japanese Strawberry",
-            PlantTimespan(6, 8),
-            11,
+            "",
+            PlantWateringSpan.MINIMUM,
             listOf(SunPreference.PART_SHADE),
             "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg",
         )
+    )
+    val searchResultSample: List<PlantSearchResult> = listOf(
+        PlantSearchResult(listOf("Cactus Cactus Cactus", "lksj lskdjfl lsdjfklsldf"), ""),
+        PlantSearchResult(listOf("Strawberry"), ""),
+        PlantSearchResult(listOf("Hibiscus"), ""),
     )
 }

@@ -7,7 +7,7 @@ import com.example.plantyreminder.domain.PlantsRepository
 import com.example.plantyreminder.data.persistance.PlantDatabase
 import com.example.plantyreminder.data.persistance.PlantsRoomRepository
 import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.PlantTimespan
+import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SuspendedResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -20,11 +20,11 @@ import org.junit.runner.RunWith
 class PlantsRoomRepositoryTest {
 
     companion object {
-        val standalonePlant = Plant(12, "Test Plant", PlantTimespan(1, 3), 22, imageUrl = "")
+        val standalonePlant = Plant(12, "Test Plant", waterSpan = PlantWateringSpan.AVERAGE, imageUrl = "", description = "")
         val plantsList = listOf(
-            Plant(1, "plant1", PlantTimespan(1, 3), 22, imageUrl = ""),
-            Plant(2, "plant2", PlantTimespan(2, 4), 24, imageUrl = ""),
-            Plant(3, "plant3", PlantTimespan(3, 5), 26, imageUrl = "")
+            Plant(1, "plant1", waterSpan = PlantWateringSpan.AVERAGE, imageUrl = "", description = ""),
+            Plant(2, "plant2", waterSpan = PlantWateringSpan.MINIMUM, imageUrl = "", description = ""),
+            Plant(3, "plant3", waterSpan = PlantWateringSpan.NONE, imageUrl = "", description = "")
         )
     }
 

@@ -1,46 +1,45 @@
-package com.example.plantyreminder.views.home
+package com.example.plantyreminder.ui.home
 
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.plantyreminder.domain.PlantsRepository
-import com.example.plantyreminder.domain.ErrorEntity
-import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.SuspendedResult
+import com.example.plantyreminder.data.PlantSearchResult
+import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
     private val repository: PlantsRepository,
 ) : ViewModel() {
-    private val _errorState: MutableStateFlow<ErrorEntity?> = MutableStateFlow(null)
-    val errorState = _errorState.asStateFlow()
 
-    private val _loadingPlantsState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val loadingPlantsState = _loadingPlantsState.asStateFlow()
+    private val dataState: DataState<List<Plant>> =
+        DataState(data = MutableStateFlow(emptyList()))
 
-    fun getUserPlants(): List<Plant> {
-        val plants: SnapshotStateList<Plant> = SnapshotStateList()
-        _loadingPlantsState.value = true
+    var loadingState = dataState.loading.asStateFlow()
+    val results = dataState.data.asStateFlow()
+    val errorState = dataState.error.asStateFlow()
 
+
+    internal fun updateUserPlants() {
+        dataState.loading.value = true
         viewModelScope.launch {
             when (val res = repository.getAll()) {
                 is SuspendedResult.Success -> {
-                    plants.clear()
-                    plants.addAll(res.data)
+                    dataState.data.update { res.data }
                 }
                 is SuspendedResult.Error -> {
-                    _errorState.value = res.error
+                    dataState.error.value = res.error
                 }
             }
-            _loadingPlantsState.value = false
+            dataState.loading.value = false
         }
-        return plants
     }
 
     fun removeAllPlants() = viewModelScope.launch {
-        when(val res = repository.deleteAll()) {
+        when (val res = repository.deleteAll()) {
             is SuspendedResult.Success -> {
                 println("plant table cleared!")
             }

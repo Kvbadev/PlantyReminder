@@ -7,15 +7,19 @@ import java.time.LocalDate
 @TypeConverters(Converters::class)
 @Entity
 data class Plant(
-    @PrimaryKey val uid: Long,
-    val name: String,
-    @ColumnInfo("water_span") val waterSpan: PlantTimespan,
-    val temperature: Int = 0,
-    val sunlight: List<SunPreference> = listOf(SunPreference.UNKNOWN),
-    @ColumnInfo("image_url") val imageUrl: String?,
-    val indoor: Boolean = false,
+    @PrimaryKey(autoGenerate = true) val uid: Long = 0,
+    @ColumnInfo("name") val name: String,
+    @ColumnInfo("description") val description: String,
+    @ColumnInfo("water_span") val waterSpan: PlantWateringSpan,
+    @ColumnInfo("sunlight") val sunlight: List<SunPreference> = listOf(SunPreference.UNKNOWN),
+    @ColumnInfo("image_url") val imageUrl: String? = null,
+    @ColumnInfo("indoor") val indoor: Boolean? = null,
     @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now(),
-    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now().plusDays(waterSpan.getEstimatedTimespan())
+    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now().plusDays(waterSpan.getEstimatedTimespan()),
+    @ColumnInfo("family") val family: String? = null,
+    @ColumnInfo("origin") val origin: String? = null,
+    @ColumnInfo("type") val type: String? = null,
+    @ColumnInfo("edible") val edible: Boolean? = null,
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,12 +29,15 @@ data class Plant(
 
         if (uid != other.uid) return false
         if (name != other.name) return false
-        if (temperature != other.temperature) return false
-        if (sunlight != other.sunlight) return false
+        if (waterSpan != other.waterSpan) return false
         if (imageUrl != other.imageUrl) return false
         if (indoor != other.indoor) return false
         if (createdAt != other.createdAt) return false
         if (nextWatering != other.nextWatering) return false
+        if (description != other.description) return false
+        if (family != other.family) return false
+        if (origin != other.origin) return false
+        if (type != other.type) return false
 
         return true
     }
@@ -38,12 +45,16 @@ data class Plant(
     override fun hashCode(): Int {
         var result = uid.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + temperature
-        result = 31 * result + sunlight.hashCode()
+        result = 31 * result + waterSpan.hashCode()
         result = 31 * result + (imageUrl?.hashCode() ?: 0)
         result = 31 * result + indoor.hashCode()
         result = 31 * result + createdAt.hashCode()
         result = 31 * result + nextWatering.hashCode()
+        result = 31 * result + description.hashCode()
+        result = 31 * result + family.hashCode()
+        result = 31 * result + origin.hashCode()
+        result = 31 * result + type.hashCode()
         return result
     }
+
 }

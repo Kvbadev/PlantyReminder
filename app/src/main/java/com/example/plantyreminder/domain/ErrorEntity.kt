@@ -1,16 +1,5 @@
 package com.example.plantyreminder.domain
 
-//sealed class ErrorEntity() {
-//    object Network : ErrorEntity()
-//    object AccessDenied : ErrorEntity()
-//    object ServiceUnavailable : ErrorEntity()
-//    sealed class DatabaseException : ErrorEntity() {
-//        object ConstraintException : DatabaseException()
-//        object CantOpenException: DatabaseException()
-//    }
-//    object Unknown : ErrorEntity()
-//}
-//
 sealed interface ErrorEntity {
     var message: String;
 
@@ -26,6 +15,7 @@ sealed interface ErrorEntity {
     }
 
     enum class Network(override var message: String) : ErrorEntity {
-        NoInternet("You have no internet connection")
+        NoInternet("You have no internet connection"),
+        InvalidHttpResponse("Could not obtain information from the API")
     }
 }
