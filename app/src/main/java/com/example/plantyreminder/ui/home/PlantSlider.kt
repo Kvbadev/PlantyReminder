@@ -30,13 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
-import coil.compose.SubcomposeAsyncImageContent
 import com.example.plantyreminder.R
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.PlantTimespan
+import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SunPreference
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -81,8 +79,6 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @Composable
 fun PlantItem(plant: Plant) {
-    val daysToWatering = ChronoUnit.DAYS.between(plant.nextWatering, LocalDate.now())
-        .toInt()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -133,13 +129,13 @@ fun PlantItem(plant: Plant) {
                 .height(IntrinsicSize.Max),
         ) {
             PlantItemMetric(
-                value = plant.waterSpan.getTimespan() + " days",
+                value = "${plant.waterSpan.getEstimatedTimespan()} days",
                 label = "Watering",
                 Modifier.weight(1f)
             )
             PlantItemMetric(
-                value = plant.temperature.toString() + "°C",
-                label = "Temperature",
+                value = plant.origin,
+                label = "Origin",
                 Modifier.weight(1f)
             )
             PlantItemMetric(
@@ -295,27 +291,27 @@ fun PlantSliderPreviewEmpty() {
 object SampleData {
     val plantsSample = listOf(
         Plant(
+            uid = 1,
             name = "African Violet",
-            waterSpan = PlantTimespan(3, 6),
-            temperature = 21,
+            "",
+            PlantWateringSpan.FREQUENT,
             sunlight = listOf(SunPreference.FULL_SHADE, SunPreference.PART_SHADE),
             imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
             createdAt = LocalDate.now().minusDays(7),
-            uid = 1
 
         ), Plant(
             uid = 2,
             "Cleistocactus",
-            PlantTimespan(2, 7),
-            16,
+            "",
+            PlantWateringSpan.AVERAGE,
             listOf(SunPreference.FULL_SUN, SunPreference.FULL_SHADE),
             "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-kkog64133e50146a6224/i-0-rtsa64133e5014e74224.jpg",
             createdAt = LocalDate.now().minusDays(3),
         ), Plant(
             uid = 3,
             "White Japanese Strawberry",
-            PlantTimespan(6, 8),
-            11,
+            "",
+            PlantWateringSpan.MINIMUM,
             listOf(SunPreference.PART_SHADE),
             "https://perenual.com/storage/marketplace/3-Whimsy%20and%20Wonder%20Seeds/p-pweY64138348e6ce81/i-0-7vjl64138348e6d801.jpg",
         )

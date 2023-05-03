@@ -1,8 +1,12 @@
 package com.example.plantyreminder.data.api
 
+import android.util.Log
 import com.example.plantyreminder.data.PlantSearchResult
+import com.example.plantyreminder.data.dto.ApiPlantObject
 import com.example.plantyreminder.domain.ErrorEntity
+import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.SuspendedResult
+import com.example.plantyreminder.utils.toPlant
 import com.example.plantyreminder.utils.toPlantSearchResult
 import okhttp3.OkHttpClient
 import retrofit2.Converter
@@ -34,11 +38,18 @@ class ApiClient(
             }
             SuspendedResult.Success(data)
         } catch (e: HttpException) {
+            Log.e("GetAll", e.message.toString())
             SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
-        } catch (e: Exception) {
-            val error = ErrorEntity.Default.Unknown
-            error.message = e.message!!
-            SuspendedResult.Error(error)
+        }
+    }
+
+    suspend fun getPlant(id: Int): SuspendedResult<Plant> {
+        return try {
+            val data = apiInterface.getPlant(id).toPlant()
+            SuspendedResult.Success(data)
+        } catch (e: HttpException) {
+            Log.e("GetPlant",e.message.toString())
+            SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
         }
     }
 }

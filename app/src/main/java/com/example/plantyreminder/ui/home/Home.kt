@@ -12,9 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.plantyreminder.MainActivity
 import org.koin.androidx.compose.getViewModel
 import com.example.plantyreminder.R
@@ -22,9 +21,9 @@ import com.example.plantyreminder.R
 @Composable
 fun Home(onNavigateToSearch: () -> Unit) {
     val homeViewModel = getViewModel<HomeViewModel>()
-    val errorState by homeViewModel.errorState.collectAsState()
-    val loadingPlantsState by homeViewModel.loadingPlantsState.collectAsState()
-    val plants by homeViewModel.plants.collectAsState()
+    val plants by homeViewModel.results.collectAsState()
+    val error by homeViewModel.errorState.collectAsState()
+    val loading by homeViewModel.loadingState.collectAsState()
 
     Surface(
         Modifier.fillMaxSize()
@@ -34,7 +33,7 @@ fun Home(onNavigateToSearch: () -> Unit) {
             isFloatingActionButtonDocked = true
         ) { padding ->
             Column(Modifier.padding(padding)) {
-                if (!loadingPlantsState) {
+                if (!loading) {
                     PlantSlider(plants)
 
                 } else {
@@ -49,10 +48,10 @@ fun Home(onNavigateToSearch: () -> Unit) {
                             )
                         )
                     }
-                    if (errorState != null && MainActivity.isActivityVisible) {
+                    if (error != null && MainActivity.isActivityVisible) {
                         Toast.makeText(
                             LocalContext.current,
-                            errorState!!.message,
+                            error!!.message,
                             Toast.LENGTH_LONG
                         ).show()
                     }
@@ -73,6 +72,12 @@ fun AddPlant(navigateToSearch: () -> Unit) {
     ) {
         Icon(Icons.Filled.Add, "")
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomePreview() {
+    Home {}
 }
 
 

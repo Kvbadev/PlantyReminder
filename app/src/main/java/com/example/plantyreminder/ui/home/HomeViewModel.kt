@@ -3,11 +3,10 @@ package com.example.plantyreminder.ui.home
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.plantyreminder.domain.PlantsRepository
-import com.example.plantyreminder.domain.ErrorEntity
-import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.SuspendedResult
+import com.example.plantyreminder.data.PlantSearchResult
+import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,27 +15,26 @@ class HomeViewModel(
     private val repository: PlantsRepository,
 ) : ViewModel() {
 
-    private val _errorState: MutableStateFlow<ErrorEntity?> = MutableStateFlow(null)
-    val errorState = _errorState.asStateFlow()
+    private val dataState: DataState<List<Plant>> =
+        DataState(data = MutableStateFlow(emptyList()))
 
-    private val _loadingPlantsState: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val loadingPlantsState = _loadingPlantsState.asStateFlow()
+    var loadingState = dataState.loading.asStateFlow()
+    val results = dataState.data.asStateFlow()
+    val errorState = dataState.error.asStateFlow()
 
-    private val _plants: MutableStateFlow<List<Plant>> = MutableStateFlow(emptyList());
-    val plants = _plants.asStateFlow()
 
     internal fun updateUserPlants() {
-        _loadingPlantsState.value = true
+        dataState.loading.value = true
         viewModelScope.launch {
             when (val res = repository.getAll()) {
                 is SuspendedResult.Success -> {
-                    _plants.update { res.data }
+                    dataState.data.update { res.data }
                 }
                 is SuspendedResult.Error -> {
-                    _errorState.value = res.error
+                    dataState.error.value = res.error
                 }
             }
-            _loadingPlantsState.value = false
+            dataState.loading.value = false
         }
     }
 

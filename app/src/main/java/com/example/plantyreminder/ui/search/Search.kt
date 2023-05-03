@@ -1,8 +1,6 @@
 package com.example.plantyreminder.ui.search
 
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,7 +20,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.home.SampleData
@@ -32,7 +29,7 @@ import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun Search(
-    onDetailsPopUp: () -> Unit,
+    onDetailsPopUp: (id: Int) -> Unit,
     onBackButton: () -> Unit
 ) {
     val searchViewModel = getViewModel<SearchViewModel>()
@@ -48,7 +45,7 @@ fun Search(
                 .height(IntrinsicSize.Max)
         ) {
             Box(Modifier.clickable {
-                onDetailsPopUp()
+                onBackButton()
             }.width(48.dp).fillMaxHeight()) {
                 Icon(
                     Icons.Filled.ArrowBack, "",

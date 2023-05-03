@@ -20,7 +20,7 @@ class SearchViewModel(
     val results = dataState.data.asStateFlow()
     val errorState = dataState.error.asStateFlow()
 
-    val debouncedFun = debounce<String>(500L, viewModelScope) {
+    val debouncedSearch = debounce<String>(300L, viewModelScope) {
         viewModelScope.launch {
             when (val res = apiClient.getAll(it)) {
                 is SuspendedResult.Success -> dataState.data.update { res.data }
@@ -41,7 +41,7 @@ class SearchViewModel(
         }
         if (results.value.size < 3) {
             dataState.loading.update { true }
-            debouncedFun(query)
+            debouncedSearch(query)
         }
     }
 
