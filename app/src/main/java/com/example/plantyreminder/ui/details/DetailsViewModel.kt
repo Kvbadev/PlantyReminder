@@ -15,15 +15,16 @@ import org.koin.androidx.compose.get
 import org.koin.androidx.compose.inject
 
 class DetailsViewModel(
-    private val apiClient: ApiClient
-    ) : ViewModel() {
+    private val apiClient: ApiClient,
+    private val plantsRepository: PlantsRepository
+) : ViewModel() {
 
-        private val dataState: DataState<Plant?> =
-            DataState(data = MutableStateFlow(null))
+    private val dataState: DataState<Plant?> =
+        DataState(data = MutableStateFlow(null))
 
-        val loadingState = dataState.loading.asStateFlow()
-        val plant = dataState.data.asStateFlow()
-        val errorState = dataState.error.asStateFlow()
+    val loadingState = dataState.loading.asStateFlow()
+    val plant = dataState.data.asStateFlow()
+    val errorState = dataState.error.asStateFlow()
 
     fun getDetailedPlant(id: Int) {
         dataState.loading.update { true }
@@ -31,6 +32,17 @@ class DetailsViewModel(
             when (val res = apiClient.getPlant(id)) {
                 is SuspendedResult.Success -> dataState.data.update { res.data }
                 is SuspendedResult.Error -> dataState.error.update { res.error }
+            }
+            dataState.loading.update { false }
+        }
+    }
+
+    fun addPlantToLibrary(plant: Plant) {
+        dataState.loading.update { true }
+        viewModelScope.launch {
+            when (val res = plantsRepository.insert(plant)) {
+                is SuspendedResult.Error -> dataState.error.update { res.error }
+                else -> {}
             }
             dataState.loading.update { false }
         }

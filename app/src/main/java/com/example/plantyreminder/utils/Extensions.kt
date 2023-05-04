@@ -15,13 +15,13 @@ fun ApiSearchResultObject.toPlantSearchResult() = PlantSearchResult(
 
 fun ApiPlantObject.toPlant() = Plant(
     name = commonName ?: "",
-    description = description ?: "",
+    description = description?.trim {it == '\n'} ?: "",
     waterSpan = PlantWateringSpan.fromText(watering?.lowercase() ?: "AVERAGE"),
     sunlight = sunlight.map {SunPreference.fromText(it)},
     imageUrl = imageUrl.url,
     indoor = indoor,
     family = family,
-    origin = "${origin.first()}, ${origin.elementAtOrNull(1) ?: ""}",
+    origin = origin,
     type = type,
     edible = edibleFruit
 )

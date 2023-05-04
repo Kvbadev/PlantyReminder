@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.example.plantyreminder.MainActivity
 import org.koin.androidx.compose.getViewModel
 import com.example.plantyreminder.R
+import com.example.plantyreminder.ui.FullScreenLoader
 
 @Composable
 fun Home(onNavigateToSearch: () -> Unit) {
@@ -36,26 +37,15 @@ fun Home(onNavigateToSearch: () -> Unit) {
                 if (!loading) {
                     PlantSlider(plants)
 
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        CircularProgressIndicator(
-                            Modifier
-                                .width(100.dp)
-                                .height(100.dp)
-                                .align(Alignment.Center),
-                            color = colorResource(
-                                id = R.color.blue_700
-                            )
-                        )
-                    }
-                    if (error != null && MainActivity.isActivityVisible) {
-                        Toast.makeText(
-                            LocalContext.current,
-                            error!!.message,
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
+                } else FullScreenLoader()
+
+                if (error != null && MainActivity.isActivityVisible) {
+                Toast.makeText(
+                    LocalContext.current,
+                    error!!.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             }
         }
     }

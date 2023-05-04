@@ -17,7 +17,7 @@ data class Plant(
     @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now(),
     @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now().plusDays(waterSpan.getEstimatedTimespan()),
     @ColumnInfo("family") val family: String? = null,
-    @ColumnInfo("origin") val origin: String? = null,
+    @ColumnInfo("origin") val origin: List<String>? = null,
     @ColumnInfo("type") val type: String? = null,
     @ColumnInfo("edible") val edible: Boolean? = null,
 ) {

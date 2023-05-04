@@ -21,7 +21,7 @@ val appModule = module {
     }
     viewModel { SearchViewModel(get()) }
     viewModel {params ->
-        val model = DetailsViewModel(get())
+        val model = DetailsViewModel(get(), get())
         model.getDetailedPlant(params.get())
         model
     }

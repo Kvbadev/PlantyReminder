@@ -134,7 +134,7 @@ fun PlantItem(plant: Plant) {
                 Modifier.weight(1f)
             )
             PlantItemMetric(
-                value = plant.origin,
+                value = plant.origin?.first(),
                 label = "Origin",
                 Modifier.weight(1f)
             )
@@ -207,6 +207,8 @@ inline fun <reified T> PlantItemMetric(
                 text = value,
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         } else if (value is List<*>) {
             Row {
