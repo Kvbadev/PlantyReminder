@@ -3,48 +3,45 @@ package com.example.plantyreminder.ui.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.api.ApiClient
-import com.example.plantyreminder.domain.DataState
-import com.example.plantyreminder.domain.Plant
-import com.example.plantyreminder.domain.PlantsRepository
-import com.example.plantyreminder.domain.SuspendedResult
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.example.plantyreminder.domain.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import org.koin.androidx.compose.inject
 
 class DetailsViewModel(
     private val apiClient: ApiClient,
     private val plantsRepository: PlantsRepository
 ) : ViewModel() {
 
-    private val dataState: DataState<Plant?> =
+    private val plantDataState: DataState<Plant?> =
         DataState(data = MutableStateFlow(null))
+    private val _operationEvent: MutableSharedFlow<UiEvent> = MutableSharedFlow()
 
-    val loadingState = dataState.loading.asStateFlow()
-    val plant = dataState.data.asStateFlow()
-    val errorState = dataState.error.asStateFlow()
+    val loadingState = plantDataState.loading.asStateFlow()
+    val plant = plantDataState.data.asStateFlow()
+    val errorState = plantDataState.error.asStateFlow()
+
+    val operationEvent = _operationEvent.asSharedFlow()
 
     fun getDetailedPlant(id: Int) {
-        dataState.loading.update { true }
+        plantDataState.loading.update { true }
         viewModelScope.launch {
             when (val res = apiClient.getPlant(id)) {
-                is SuspendedResult.Success -> dataState.data.update { res.data }
-                is SuspendedResult.Error -> dataState.error.update { res.error }
+                is SuspendedResult.Success -> plantDataState.data.update { res.data }
+                is SuspendedResult.Error -> plantDataState.error.update { res.error }
             }
-            dataState.loading.update { false }
+            plantDataState.loading.update { false }
         }
     }
 
     fun addPlantToLibrary(plant: Plant) {
-        dataState.loading.update { true }
         viewModelScope.launch {
+            _operationEvent.emit(UiEvent.Loading())
+            delay(2000L)
             when (val res = plantsRepository.insert(plant)) {
-                is SuspendedResult.Error -> dataState.error.update { res.error }
-                else -> {}
+                is SuspendedResult.Success -> _operationEvent.emit(UiEvent.Success(res.data))
+                is SuspendedResult.Error -> plantDataState.error.update { res.error }
             }
-            dataState.loading.update { false }
         }
     }
 }

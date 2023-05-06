@@ -22,20 +22,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
-import com.example.plantyreminder.ui.home.SampleData
-import com.example.plantyreminder.utils.debounce
-import org.koin.androidx.compose.getViewModel
+import com.example.plantyreminder.ui.PlantyScreen
+import org.koin.androidx.compose.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 @Composable
 fun Search(
-    onDetailsPopUp: (id: Int) -> Unit,
-    onBackButton: () -> Unit
+    navigateTo: (String) -> Unit
 ) {
-    val searchViewModel = getViewModel<SearchViewModel>()
+    val searchViewModel: SearchViewModel = koinViewModel()
+
     val results by searchViewModel.results.collectAsState()
     val errorState by searchViewModel.errorState.collectAsState()
     val loading by searchViewModel.loadingState.collectAsState()
+    val query = remember { searchViewModel.query }
 
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -44,15 +45,21 @@ fun Search(
                 .width(IntrinsicSize.Max)
                 .height(IntrinsicSize.Max)
         ) {
-            Box(Modifier.clickable {
-                onBackButton()
-            }.width(48.dp).fillMaxHeight()) {
+            Box(
+                Modifier
+                    .clickable {
+                        navigateTo(PlantyScreen.Home.name)
+                    }
+                    .width(48.dp)
+                    .fillMaxHeight()) {
                 Icon(
                     Icons.Filled.ArrowBack, "",
-                    modifier = Modifier.align(Alignment.Center).size(32.dp)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(32.dp)
                 )
             }
-            SearchView(searchViewModel::getSearchResults)
+            SearchView(query, searchViewModel::getSearchResults)
         }
         if (loading) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -66,7 +73,7 @@ fun Search(
                     )
                 )
             }
-        } else PlantsList(plants = results, onDetailsPopUp = onDetailsPopUp)
+        } else PlantsList(plants = results, onDetailsPopUp = navigateTo)
     }
 
     if (errorState != null && MainActivity.isActivityVisible) {
@@ -79,15 +86,14 @@ fun Search(
 }
 
 @Composable
-fun SearchView(onValueChange: (value: String) -> Unit) {
-    var value by remember { mutableStateOf("") }
+fun SearchView(query: MutableState<String>, onValueChange: () -> Unit) {
     val isFocused = remember { mutableStateOf(false) }
 
     OutlinedTextField(
-        value = value,
+        value = query.value,
         onValueChange = {
-            value = it
-            onValueChange(value)
+            query.value = it
+            onValueChange()
         },
         textStyle = TextStyle(fontSize = 16.sp),
         leadingIcon = {
@@ -118,5 +124,6 @@ fun SearchView(onValueChange: (value: String) -> Unit) {
 @Preview
 @Composable
 fun SearchPreview() {
-    SearchView {}
+    val text = remember { mutableStateOf("") }
+    SearchView(text) {}
 }

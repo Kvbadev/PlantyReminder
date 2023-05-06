@@ -21,7 +21,9 @@ import com.example.plantyreminder.ui.FullScreenLoader
 
 @Composable
 fun Home(onNavigateToSearch: () -> Unit) {
+    AddPlant(onNavigateToSearch)
     val homeViewModel = getViewModel<HomeViewModel>()
+
     val plants by homeViewModel.results.collectAsState()
     val error by homeViewModel.errorState.collectAsState()
     val loading by homeViewModel.loadingState.collectAsState()
@@ -40,12 +42,12 @@ fun Home(onNavigateToSearch: () -> Unit) {
                 } else FullScreenLoader()
 
                 if (error != null && MainActivity.isActivityVisible) {
-                Toast.makeText(
-                    LocalContext.current,
-                    error!!.message,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+                    Toast.makeText(
+                        LocalContext.current,
+                        error!!.message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import com.example.plantyreminder.ui.home.HomeViewModel
 import com.example.plantyreminder.ui.search.SearchViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 
 val appModule = module {
@@ -19,8 +20,8 @@ val appModule = module {
         model.updateUserPlants()
         model
     }
-    viewModel { SearchViewModel(get()) }
-    viewModel {params ->
+    viewModelOf(::SearchViewModel)
+    viewModel { params ->
         val model = DetailsViewModel(get(), get())
         model.getDetailedPlant(params.get())
         model

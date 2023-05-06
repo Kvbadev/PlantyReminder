@@ -1,5 +1,7 @@
 package com.example.plantyreminder.ui.search
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.api.ApiClient
@@ -19,6 +21,7 @@ class SearchViewModel(
     val loadingState = dataState.loading.asStateFlow()
     val results = dataState.data.asStateFlow()
     val errorState = dataState.error.asStateFlow()
+    val query = mutableStateOf("")
 
     val debouncedSearch = debounce<String>(300L, viewModelScope) {
         viewModelScope.launch {
@@ -29,19 +32,17 @@ class SearchViewModel(
             dataState.loading.update { false }
         }
     }
-
-    fun getSearchResults(query: String) {
-
+    fun getSearchResults() {
         if (results.value.size >= 3) {
             dataState.data.update { list ->
                 list.filter { searchResult ->
-                    !searchResult.names.none { it.contains(query) }
+                    !searchResult.names.none { it.contains(query.value) }
                 }
             }
         }
         if (results.value.size < 3) {
             dataState.loading.update { true }
-            debouncedSearch(query)
+            debouncedSearch(query.value)
         }
     }
 

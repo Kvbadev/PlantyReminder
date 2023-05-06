@@ -13,11 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.details.Details
-import com.example.plantyreminder.ui.details.DetailsViewModel
 import com.example.plantyreminder.ui.home.Home
 import com.example.plantyreminder.ui.search.Search
-import org.koin.androidx.compose.getViewModel
-
 
 enum class PlantyScreen {
     Home, Search, Details, Settings
@@ -43,17 +40,16 @@ fun PlantyReminderApp() {
                 }
             }
             composable(PlantyScreen.Search.name) {
-                Search(
-                    { id -> navController.navigate("${PlantyScreen.Details.name}/$id") },
-                    { navController.navigate(PlantyScreen.Home.name) },
-                )
+                Search { route -> navController.navigate(route) }
             }
             composable(
                 "${PlantyScreen.Details.name}/{plantId}",
                 arguments = listOf(navArgument("plantId") { type = NavType.IntType })
             ) {
                 val id = it.arguments?.getInt("plantId")
-                Details(id)
+                Details(id) {
+                    navController.navigate(PlantyScreen.Home.name)
+                }
             }
         }
     }

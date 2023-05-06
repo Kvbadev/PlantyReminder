@@ -91,12 +91,12 @@ fun PlantItem(plant: Plant) {
                 .height(900.pxToDp())
                 .fillMaxWidth()
         ) {
-
             SubcomposeAsyncImage(
                 model = plant.imageUrl,
                 contentDescription = plant.name,
                 modifier = Modifier
                     .align(Alignment.Center)
+                    .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
                 loading = { CircularProgressIndicator() }
@@ -129,7 +129,7 @@ fun PlantItem(plant: Plant) {
                 .height(IntrinsicSize.Max),
         ) {
             PlantItemMetric(
-                value = "${plant.waterSpan.getEstimatedTimespan()} days",
+                value = "${plant.waterSpan?.getEstimatedTimespan()} days",
                 label = "Watering",
                 Modifier.weight(1f)
             )

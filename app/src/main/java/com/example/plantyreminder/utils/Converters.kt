@@ -24,7 +24,7 @@ class Converters {
 
     @TypeConverter
     fun stringToListOfString(strings: String?): List<String> {
-        val listType = object : TypeToken<List<SunPreference>>() {}.type
+        val listType = object : TypeToken<List<String>>() {}.type
         return gsonConverter.fromJson(strings, listType)
     }
 

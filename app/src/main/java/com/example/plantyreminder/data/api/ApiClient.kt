@@ -8,6 +8,7 @@ import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.SuspendedResult
 import com.example.plantyreminder.utils.toPlant
 import com.example.plantyreminder.utils.toPlantSearchResult
+import com.google.gson.JsonSyntaxException
 import okhttp3.OkHttpClient
 import retrofit2.Converter
 import retrofit2.HttpException
@@ -38,7 +39,7 @@ class ApiClient(
             }
             SuspendedResult.Success(data)
         } catch (e: HttpException) {
-            Log.e("GetAll", e.message.toString())
+//            Log.e("GetAll", e.message.toString())
             SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
         }
     }
@@ -48,7 +49,7 @@ class ApiClient(
             val data = apiInterface.getPlant(id).toPlant()
             SuspendedResult.Success(data)
         } catch (e: HttpException) {
-            Log.e("GetPlant",e.message.toString())
+            Log.e("GetPlant", e.message.toString())
             SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
         }
     }

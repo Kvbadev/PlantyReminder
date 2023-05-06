@@ -1,17 +1,18 @@
 package com.example.plantyreminder.ui.details
 
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -24,24 +25,46 @@ import coil.compose.SubcomposeAsyncImage
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
+import com.example.plantyreminder.domain.UiEvent
 import com.example.plantyreminder.ui.FullScreenLoader
 import com.example.plantyreminder.ui.home.SampleData
 import com.example.plantyreminder.ui.home.pxToDp
+import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun Details(id: Int?) {
+fun Details(id: Int?, navigateBack: () -> Unit) {
     val detailsViewModel: DetailsViewModel = getViewModel(parameters = { parametersOf(id) })
+
     val plant by detailsViewModel.plant.collectAsState()
     val error by detailsViewModel.errorState.collectAsState()
     val loading by detailsViewModel.loadingState.collectAsState()
+    val context = LocalContext.current
+    var operationLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        detailsViewModel.operationEvent.collectLatest {
+            when (it) {
+                is UiEvent.Loading -> operationLoading = true
+                is UiEvent.Success -> {
+                    operationLoading = false
+                    Toast.makeText(
+                        context,
+                        "Plant with id ${it.id} has been added!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    navigateBack()
+                }
+            }
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         if (!loading) {
             PlantDetail(
-                plant = plant ?: throw Exception("Plant was null")
-
+                plant = plant ?: throw Exception("Plant was null"),
+                operationLoading
             ) {
                 detailsViewModel.addPlantToLibrary(
                     plant = plant ?: throw Exception("Plant was null")
@@ -52,77 +75,89 @@ fun Details(id: Int?) {
 
         if (error != null && MainActivity.isActivityVisible) {
             Toast.makeText(
-                LocalContext.current, error!!.message, Toast.LENGTH_LONG
+                context, error!!.message, Toast.LENGTH_LONG
             ).show()
         }
     }
 }
 
 @Composable
-fun PlantDetail(plant: Plant, addPlantToSaved: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .height(320.dp)
-            .fillMaxWidth()
-            .padding(8.dp, 10.dp, 8.dp, 8.dp)
-    ) {
-        SubcomposeAsyncImage(
-            model = plant.imageUrl,
-            contentDescription = plant.name,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop,
-            loading = { CircularProgressIndicator() }
-        )
-    }
+fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
+
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp, 0.dp)
+            .fillMaxSize()
+            .padding(10.dp, 0.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        Text(
-            text = plant.name,
-            color = colorResource(id = R.color.green_700),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            fontSize = 32.sp,
-        )
-        Spacer(Modifier.padding(2.dp))
-        Text(
-            text = plant.description,
-            color = colorResource(id = R.color.black),
-            fontSize = 16.sp,
-        )
+        Box(
+            modifier = Modifier
+                .height(320.dp)
+                .fillMaxWidth()
+                .padding(8.dp, 10.dp, 8.dp, 8.dp)
+        ) {
+            SubcomposeAsyncImage(
+                model = plant.imageUrl,
+                contentDescription = plant.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
+                loading = { CircularProgressIndicator() }
+            )
+        }
+        Column {
+            Text(
+                text = plant.name,
+                color = colorResource(id = R.color.green_700),
+                maxLines = if (plant.description == "") 2 else 1,
+                overflow = TextOverflow.Ellipsis,
+                fontSize = 32.sp,
+            )
+            Text(
+                text = if (plant.description != "") plant.description else "No Description",
+                color = colorResource(id = R.color.black),
+                fontSize = 16.sp,
+            )
+        }
         Spacer(Modifier.padding(10.dp))
         PlantParameter(label = "Origin", value = plant.origin?.first())
         PlantParameter(label = "Family", value = plant.family)
         PlantParameter(label = "type", value = plant.type)
         PlantParameter(label = "edible", value = (plant.edible ?: "N/A").toString())
-        AddToPlants(addPlantToSaved)
+        AddToPlants(operationLoading, addPlantToSaved)
     }
 
 
 }
 
 @Composable
-fun AddToPlants(addPlantToSaved: () -> Unit) {
-    Box(
+fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
+    Button(
+        onClick = {
+            addPlantToSaved()
+        },
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(40.dp)
+            .padding(8.dp, 0.dp),
     ) {
-        Button(
-            onClick = {
-                addPlantToSaved()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 0.dp)
-        ) {
-            Text(text = "Add to ")
-            Text(text = "your plants", color = colorResource(id = R.color.green_500))
+        Text(text = "Add to ", color = colorResource(id = R.color.black))
+        Text(text = "your plants", color = colorResource(id = R.color.white))
+        if (operationLoading) {
+            Spacer(modifier = Modifier.padding(10.dp))
+            Box(
+                Modifier
+                    .height(40.dp)
+            ) {
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.black),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .size(24.dp)
+                )
+            }
         }
     }
 }
@@ -157,5 +192,5 @@ fun PlantParameter(label: String, value: String?) {
 @Composable
 @Preview(showBackground = true)
 private fun PlantDetailPreview() {
-    PlantDetail(plant = SampleData.plantsSample[0]){}
+    PlantDetail(plant = SampleData.plantsSample[0], true) {}
 }
