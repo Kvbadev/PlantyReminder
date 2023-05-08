@@ -99,7 +99,15 @@ fun PlantItem(plant: Plant) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
-                loading = { CircularProgressIndicator() }
+                loading = {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(900.pxToDp())
+                    ) {
+                        CircularProgressIndicator(Modifier.size(64.dp).align(Alignment.Center))
+                    }
+                }
             )
         }
         Column(
@@ -301,7 +309,7 @@ object SampleData {
             imageUrl = "https://perenual.com/storage/marketplace/4-Le%20Jardin%20Nordique/p-bC6B64133c0743b34224/i-0-ymxg64133c07444a4224.jpg",
             createdAt = LocalDate.now().minusDays(7),
 
-        ), Plant(
+            ), Plant(
             uid = 2,
             "Cleistocactus",
             "",
