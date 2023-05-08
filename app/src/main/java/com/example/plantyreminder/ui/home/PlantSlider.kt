@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +37,7 @@ import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SunPreference
+import com.example.plantyreminder.ui.ExtendableText
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -116,12 +118,13 @@ fun PlantItem(plant: Plant) {
                 .fillMaxWidth()
                 .padding(0.dp, 10.dp)
         ) {
-            Text(
+
+            ExtendableText(
                 text = plant.name,
-                color = colorResource(id = R.color.blue_700),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 32.sp,
+                textStyle = TextStyle(
+                    color = colorResource(id = R.color.green_700),
+                    fontSize = 32.sp,
+                )
             )
             Text(
                 text = "${ChronoUnit.DAYS.between(plant.createdAt, LocalDate.now())} days",
@@ -162,7 +165,7 @@ fun ItemNextWatering(daysToWatering: Long) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp, 16.dp)
-            .border(2.dp, colorResource(id = R.color.blue_700), RoundedCornerShape(6.dp))
+            .border(2.dp, colorResource(id = R.color.green_700), RoundedCornerShape(6.dp))
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -191,8 +194,6 @@ inline fun <reified T> PlantItemMetric(
     label: String,
     columnModifier: Modifier = Modifier
 ) {
-    val isText = T::class.java == String::class.java
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -208,15 +209,15 @@ inline fun <reified T> PlantItemMetric(
             color = colorResource(id = R.color.gray_500),
             textAlign = TextAlign.Start,
         )
-        if (isText && value is String) {
+        if (value is String) {
             Spacer(modifier = Modifier.padding(4.dp))
-            Text(
-                color = colorResource(id = R.color.gray_700),
+            ExtendableText(
                 text = value,
-                fontSize = 24.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                textStyle = TextStyle(
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.Center,
+                    color = colorResource(id = R.color.gray_700)
+                )
             )
         } else if (value is List<*>) {
             Row {

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.UiEvent
+import com.example.plantyreminder.ui.ExtendableText
 import com.example.plantyreminder.ui.FullScreenLoader
 import com.example.plantyreminder.ui.home.SampleData
 import com.example.plantyreminder.ui.home.pxToDp
@@ -89,7 +91,7 @@ fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> 
         modifier = Modifier
             .fillMaxSize()
             .padding(10.dp, 0.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.SpaceAround
     ) {
         Box(
             modifier = Modifier
@@ -108,12 +110,11 @@ fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> 
             )
         }
         Column {
-            Text(
-                text = plant.name,
-                color = colorResource(id = R.color.green_700),
-                maxLines = if (plant.description == "") 2 else 1,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 32.sp,
+            ExtendableText(
+                text = plant.name, textStyle = TextStyle(
+                    color = colorResource(id = R.color.green_700),
+                    fontSize = 32.sp,
+                )
             )
             Text(
                 text = if (plant.description != "") plant.description else "No Description",
@@ -121,7 +122,7 @@ fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> 
                 fontSize = 16.sp,
             )
         }
-        Spacer(Modifier.padding(10.dp))
+        Spacer(Modifier.padding(2.dp))
         PlantParameter(label = "Origin", value = plant.origin?.first())
         PlantParameter(label = "Family", value = plant.family)
         PlantParameter(label = "type", value = plant.type)
@@ -140,8 +141,8 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(40.dp)
-            .padding(8.dp, 0.dp),
+            .padding(8.dp)
+            .height(40.dp),
     ) {
         Text(text = "Add to ", color = colorResource(id = R.color.black))
         Text(text = "your plants", color = colorResource(id = R.color.white))
