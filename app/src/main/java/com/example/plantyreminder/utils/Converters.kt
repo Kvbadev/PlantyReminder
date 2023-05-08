@@ -23,6 +23,12 @@ class Converters {
     }
 
     @TypeConverter
+    fun stringToListOfString(strings: String?): List<String> {
+        val listType = object : TypeToken<List<String>>() {}.type
+        return gsonConverter.fromJson(strings, listType)
+    }
+
+    @TypeConverter
     fun localDateFromString(date: String?): LocalDate {
         val (day, month, year) = date!!.split("-").map { it.toInt() }
         return LocalDate.of(year, month, day)

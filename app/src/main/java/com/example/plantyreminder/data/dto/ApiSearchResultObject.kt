@@ -10,11 +10,11 @@ data class ApiSearchResultObject(
     val commonName: String,
 
     @SerializedName("other_name")
-    val otherNames: List<String>,
+    val otherNames: Any,
 
     @SerializedName("scientific_name")
-    val scientificNames: List<String>,
+    val scientificNames: Any,
 
     @SerializedName("default_image")
-    val imageUrl: ApiResultImageUrl
+    val imageUrl: Any
 )

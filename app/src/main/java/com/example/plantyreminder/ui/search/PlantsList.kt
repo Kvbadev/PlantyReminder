@@ -20,11 +20,12 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.R
+import com.example.plantyreminder.ui.PlantyScreen
 
 @Composable
 fun PlantsList(
     plants: List<PlantSearchResult>,
-    onDetailsPopUp: (id: Int) -> Unit
+    onDetailsPopUp: (String) -> Unit
 ) {
     LazyColumn(Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)) {
 
@@ -35,7 +36,7 @@ fun PlantsList(
             Row(
                 Modifier
                     .clickable {
-                        onDetailsPopUp(searchResult.id)
+                        onDetailsPopUp("${PlantyScreen.Details.name}/${searchResult.id}",)
                     }
                     .fillMaxWidth()
                     .padding(2.dp, 10.dp),

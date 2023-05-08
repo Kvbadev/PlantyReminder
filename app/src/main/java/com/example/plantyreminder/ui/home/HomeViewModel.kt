@@ -1,12 +1,9 @@
 package com.example.plantyreminder.ui.home
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,17 +21,17 @@ class HomeViewModel(
 
 
     internal fun updateUserPlants() {
-        dataState.loading.value = true
+        dataState.loading.update { true }
         viewModelScope.launch {
             when (val res = repository.getAll()) {
                 is SuspendedResult.Success -> {
                     dataState.data.update { res.data }
                 }
                 is SuspendedResult.Error -> {
-                    dataState.error.value = res.error
+                    dataState.error.update { res.error }
                 }
             }
-            dataState.loading.value = false
+            dataState.loading.update { false }
         }
     }
 

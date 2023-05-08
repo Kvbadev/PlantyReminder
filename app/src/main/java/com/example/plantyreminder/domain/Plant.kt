@@ -10,14 +10,14 @@ data class Plant(
     @PrimaryKey(autoGenerate = true) val uid: Long = 0,
     @ColumnInfo("name") val name: String,
     @ColumnInfo("description") val description: String,
-    @ColumnInfo("water_span") val waterSpan: PlantWateringSpan,
-    @ColumnInfo("sunlight") val sunlight: List<SunPreference> = listOf(SunPreference.UNKNOWN),
+    @ColumnInfo("water_span") val waterSpan: PlantWateringSpan? = null,
+    @ColumnInfo("sunlight") val sunlight: List<SunPreference>? = null,
     @ColumnInfo("image_url") val imageUrl: String? = null,
     @ColumnInfo("indoor") val indoor: Boolean? = null,
     @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now(),
-    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now().plusDays(waterSpan.getEstimatedTimespan()),
+    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now(),
     @ColumnInfo("family") val family: String? = null,
-    @ColumnInfo("origin") val origin: String? = null,
+    @ColumnInfo("origin") val origin: List<String>? = null,
     @ColumnInfo("type") val type: String? = null,
     @ColumnInfo("edible") val edible: Boolean? = null,
 ) {
@@ -36,7 +36,6 @@ data class Plant(
         if (nextWatering != other.nextWatering) return false
         if (description != other.description) return false
         if (family != other.family) return false
-        if (origin != other.origin) return false
         if (type != other.type) return false
 
         return true
@@ -52,7 +51,6 @@ data class Plant(
         result = 31 * result + nextWatering.hashCode()
         result = 31 * result + description.hashCode()
         result = 31 * result + family.hashCode()
-        result = 31 * result + origin.hashCode()
         result = 31 * result + type.hashCode()
         return result
     }
