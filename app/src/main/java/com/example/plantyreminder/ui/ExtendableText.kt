@@ -60,7 +60,7 @@ private fun OverflowPopup(popupControl: MutableState<Boolean>, text: String) {
             clippingEnabled = true,
         ),
         onDismissRequest = { popupControl.value = false },
-        offset = IntOffset(0, 120)
+//        offset = IntOffset(0, 120)
     ) {
         Box(
             modifier = Modifier

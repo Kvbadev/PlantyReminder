@@ -1,6 +1,9 @@
 package com.example.plantyreminder.data.api
 
 import com.example.plantyreminder.BuildConfig
+import com.example.plantyreminder.data.dto.ApiSearchResultObject
+import com.example.plantyreminder.utils.ApiSearchResultDeserializer
+import com.google.gson.GsonBuilder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,7 +14,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 class ApiClientFactory {
 
     private fun createApiClient(converterFactory: Converter.Factory): ApiClient {
-        val loggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
+        val loggingInterceptor =
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
         val keyInterceptor = Interceptor {
             val newUrl = it.request().url
                 .newBuilder()
@@ -38,8 +42,12 @@ class ApiClientFactory {
 
         return apiClient
     }
+
     fun createGsonApiClient(): ApiClient {
-        return createApiClient(GsonConverterFactory.create())
+        val gson = GsonBuilder().apply {
+            registerTypeAdapter(ApiSearchResultObject::class.java, ApiSearchResultDeserializer())
+        }.create()
+        return createApiClient(GsonConverterFactory.create(gson))
     }
 
     fun createScalarsApiClient(): ApiClient {

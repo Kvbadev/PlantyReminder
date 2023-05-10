@@ -65,7 +65,7 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         if (!loading) {
             PlantDetail(
-                plant = plant ?: throw Exception("Plant was null"),
+                plant = plant,
                 operationLoading
             ) {
                 detailsViewModel.addPlantToLibrary(
@@ -84,7 +84,7 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
 }
 
 @Composable
-fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
+fun PlantDetail(plant: Plant?, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -93,44 +93,59 @@ fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> 
             .padding(10.dp, 0.dp),
         verticalArrangement = Arrangement.SpaceAround
     ) {
-        Box(
-            modifier = Modifier
-                .height(320.dp)
-                .fillMaxWidth()
-                .padding(8.dp, 10.dp, 8.dp, 8.dp)
-        ) {
-            SubcomposeAsyncImage(
-                model = plant.imageUrl,
-                contentDescription = plant.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                loading = { CircularProgressIndicator() }
-            )
-        }
-        Column {
-            ExtendableText(
-                text = plant.name, textStyle = TextStyle(
-                    color = colorResource(id = R.color.green_700),
-                    fontSize = 32.sp,
+        if (plant == null) {
+            Column {
+                ExtendableText(
+                    text = "Plant Unavailable...", textStyle = TextStyle(
+                        color = colorResource(id = R.color.green_700),
+                        fontSize = 32.sp,
+                    )
                 )
-            )
-            Text(
-                text = if (plant.description != "") plant.description else "No Description",
-                color = colorResource(id = R.color.black),
-                fontSize = 16.sp,
-            )
+                Text(
+                    text = "Unfortunately, this plant is not available in the free version of Perenual Api. We recommend to choose a different plant or try in a few hours.",
+                    color = colorResource(id = R.color.black),
+                    fontSize = 16.sp,
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .height(320.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp, 10.dp, 8.dp, 8.dp)
+            ) {
+                SubcomposeAsyncImage(
+                    model = plant.imageUrl,
+                    contentDescription = plant.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop,
+                    loading = { CircularProgressIndicator() }
+                )
+            }
+            Column {
+                ExtendableText(
+                    text = plant.name, textStyle = TextStyle(
+                        color = colorResource(id = R.color.green_700),
+                        fontSize = 32.sp,
+                    )
+                )
+                Text(
+                    text = if (plant.description != "") plant.description else "No Description",
+                    color = colorResource(id = R.color.black),
+                    fontSize = 16.sp,
+                )
+            }
+            Spacer(Modifier.padding(2.dp))
+            PlantParameter(label = "Origin", value = plant.origin?.first())
+            PlantParameter(label = "Family", value = plant.family)
+            PlantParameter(label = "type", value = plant.type)
+            PlantParameter(label = "edible", value = (plant.edible ?: "N/A").toString())
+            AddToPlants(operationLoading, addPlantToSaved)
         }
-        Spacer(Modifier.padding(2.dp))
-        PlantParameter(label = "Origin", value = plant.origin?.first())
-        PlantParameter(label = "Family", value = plant.family)
-        PlantParameter(label = "type", value = plant.type)
-        PlantParameter(label = "edible", value = (plant.edible ?: "N/A").toString())
-        AddToPlants(operationLoading, addPlantToSaved)
+
     }
-
-
 }
 
 @Composable
@@ -161,6 +176,7 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
             }
         }
     }
+
 }
 
 @Composable
@@ -178,16 +194,23 @@ fun PlantParameter(label: String, value: String?) {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.weight(1f))
-        Text(
-            text = value ?: "N/A",
+        ExtendableText(text = value ?: "N/A", textStyle = TextStyle(
             color = colorResource(id = R.color.green_500),
             fontSize = 20.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(3f),
             textAlign = TextAlign.Center
-        )
+        ),
+        modifier = Modifier.weight(3f))
+//        Text(
+//            text = value ?: "N/A",
+//            color = colorResource(id = R.color.green_500),
+//            fontSize = 20.sp,
+//            maxLines = 1,
+//            overflow = TextOverflow.Ellipsis,
+//            modifier = Modifier.weight(3f),
+//            textAlign = TextAlign.Center
+//        )
     }
+
 }
 
 @Composable

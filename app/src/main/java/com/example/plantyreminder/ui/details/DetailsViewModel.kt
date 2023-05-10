@@ -28,7 +28,12 @@ class DetailsViewModel(
         viewModelScope.launch {
             when (val res = apiClient.getPlant(id)) {
                 is SuspendedResult.Success -> plantDataState.data.update { res.data }
-                is SuspendedResult.Error -> plantDataState.error.update { res.error }
+                is SuspendedResult.Error -> {
+                    if (res.error != ErrorEntity.Network.ApiPaywall)
+                        plantDataState.error.update {
+                            res.error
+                        }
+                }
             }
             plantDataState.loading.update { false }
         }

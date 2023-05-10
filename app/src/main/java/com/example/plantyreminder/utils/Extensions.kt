@@ -14,23 +14,11 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import kotlin.reflect.full.declaredMemberProperties
 
-fun ApiSearchResultObject.toPlantSearchResult(): PlantSearchResult? {
-    //Always true if the desired plant is behind the paywall
-    if (this.imageUrl.toString().contains("https://perenual.com/subscription-api-pricing")) return null
-
-    val otherNames = otherNames as? List<*>
-    val scientificNames = scientificNames as? List<*>
-    val image = imageUrl as LinkedTreeMap<*, *>
-    if(otherNames == null || scientificNames == null) return null
-
-    val allNames = (listOf(commonName) + otherNames + scientificNames) as List<*>
-
-    return PlantSearchResult(
-        id = id,
-        names = allNames as? List<String> ?: emptyList(),
-        imageUrl = image["original_url"] as? String ?: "",
-    )
-}
+fun ApiSearchResultObject.toPlantSearchResult() = PlantSearchResult(
+    id = id,
+    names = listOf(commonName) + (otherNames ?: emptyList()) + (scientificNames ?: emptyList()),
+    imageUrl = imageUrl?.url ?: "",
+)
 
 fun ApiPlantObject.toPlant() = Plant(
     name = commonName ?: "",

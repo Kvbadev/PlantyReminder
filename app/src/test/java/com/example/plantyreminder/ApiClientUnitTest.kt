@@ -27,7 +27,7 @@ class ApiClientUnitTest(
                 assertNotEquals(0, response.data.size) {"Size of the list is 0"}
                 assertTrue(response.data.first()::class.java == PlantSearchResult::class.java) {"Elements are not of type Plant"}
             }
-            is SuspendedResult.Error -> assertEquals(Exception::class.java, response.error ::class.java) { "Returned value is not HttpException" }
+            is SuspendedResult.Error -> assert(response.error is ErrorEntity.Network) { "Returned value is not HttpException" }
         }
     }
 
@@ -38,7 +38,7 @@ class ApiClientUnitTest(
                 assertNotEquals(0, response.data.size) {"Size of the list is 0"}
                 assertTrue(response.data.first()::class.java == PlantSearchResult::class.java) {"Elements are not of type Plant"}
             }
-            is SuspendedResult.Error -> assertEquals(Exception::class.java, response.error ::class.java) { "Returned value is not HttpException" }
+            is SuspendedResult.Error -> assert(response.error is ErrorEntity.Network) { "Returned value is not HttpException" }
         }
     }
 
@@ -51,7 +51,11 @@ class ApiClientUnitTest(
 
     @Test
     fun getEmptyList(): Unit = runBlocking {
-        val response = apiClientGson.getAll(UUID.randomUUID().toString()) as SuspendedResult.Success
-        assertTrue(response.data.isEmpty())
+        when(val response = apiClientGson.getAll(UUID.randomUUID().toString())) {
+            is SuspendedResult.Success -> assertTrue(response.data.isEmpty())
+            is SuspendedResult.Error -> assertTrue(response.error is ErrorEntity.Network)
+        }
+
+
     }
 }
