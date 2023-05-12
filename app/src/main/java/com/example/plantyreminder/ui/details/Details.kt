@@ -23,14 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.UiEvent
+import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.ExtendableText
 import com.example.plantyreminder.ui.FullScreenLoader
 import com.example.plantyreminder.ui.home.SampleData
-import com.example.plantyreminder.ui.home.pxToDp
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -48,12 +49,12 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
     LaunchedEffect(Unit) {
         detailsViewModel.operationEvent.collectLatest {
             when (it) {
-                is UiEvent.Loading -> operationLoading = true
-                is UiEvent.Success -> {
+                UiEvent.Loading -> operationLoading = true
+                UiEvent.Success -> {
                     operationLoading = false
                     Toast.makeText(
                         context,
-                        "Plant with id ${it.id} has been added!",
+                        "A new plant has been added!",
                         Toast.LENGTH_LONG
                     ).show()
                     navigateBack()
@@ -115,14 +116,18 @@ fun PlantDetail(plant: Plant?, operationLoading: Boolean, addPlantToSaved: () ->
                     .padding(8.dp, 10.dp, 8.dp, 8.dp)
             ) {
                 SubcomposeAsyncImage(
-                    model = plant.imageUrl,
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(plant.imageUrl)
+                        .build(),
                     contentDescription = plant.name,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp)),
-                    contentScale = ContentScale.Crop,
-                    loading = { CircularProgressIndicator() }
-                )
+                        .clip(RoundedCornerShape(8.dp))
+                        .align(Alignment.Center),
+                    contentScale = ContentScale.Crop
+                ) {
+                    AsyncImageHandler(subcomposeAsyncImageScope = this, boxSize = 128.dp)
+                }
             }
             Column {
                 ExtendableText(
@@ -194,21 +199,14 @@ fun PlantParameter(label: String, value: String?) {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.weight(1f))
-        ExtendableText(text = value ?: "N/A", textStyle = TextStyle(
-            color = colorResource(id = R.color.green_500),
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center
-        ),
-        modifier = Modifier.weight(3f))
-//        Text(
-//            text = value ?: "N/A",
-//            color = colorResource(id = R.color.green_500),
-//            fontSize = 20.sp,
-//            maxLines = 1,
-//            overflow = TextOverflow.Ellipsis,
-//            modifier = Modifier.weight(3f),
-//            textAlign = TextAlign.Center
-//        )
+        ExtendableText(
+            text = value ?: "N/A", textStyle = TextStyle(
+                color = colorResource(id = R.color.green_500),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier.weight(3f)
+        )
     }
 
 }

@@ -39,14 +39,12 @@ class DetailsViewModel(
         }
     }
 
-    fun addPlantToLibrary(plant: Plant) {
-        viewModelScope.launch {
-            _operationEvent.emit(UiEvent.Loading())
-            delay(2000L)
-            when (val res = plantsRepository.insert(plant)) {
-                is SuspendedResult.Success -> _operationEvent.emit(UiEvent.Success(res.data))
-                is SuspendedResult.Error -> plantDataState.error.update { res.error }
-            }
+    fun addPlantToLibrary(plant: Plant) = viewModelScope.launch {
+        _operationEvent.emit(UiEvent.Loading)
+        delay(2000L)
+        when (val res = plantsRepository.insert(plant)) {
+            is SuspendedResult.Success -> _operationEvent.emit(UiEvent.Success)
+            is SuspendedResult.Error -> plantDataState.error.update { res.error }
         }
     }
 }

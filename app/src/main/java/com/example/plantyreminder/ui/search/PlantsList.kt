@@ -26,6 +26,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import coil.request.ImageRequest
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.R
+import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.PlantyScreen
 
 @Composable
@@ -65,29 +66,7 @@ fun PlantsList(
                             .align(Alignment.Center),
                         contentScale = ContentScale.Crop
                     ) {
-                        when (painter.state) {
-                            is AsyncImagePainter.State.Loading -> {
-                                Box(Modifier.size(64.dp)) {
-                                    CircularProgressIndicator(
-                                        Modifier
-                                            .align(Alignment.Center)
-                                            .size(32.dp)
-                                    )
-                                }
-                            }
-                            is AsyncImagePainter.State.Error -> {
-                                Box(Modifier.size(64.dp)) {
-                                    Icon(
-                                        imageVector = Icons.Default.Warning,
-                                        contentDescription = "",
-                                        modifier = Modifier.align(Alignment.Center)
-                                    )
-                                }
-                            }
-                            else -> {
-                                SubcomposeAsyncImageContent()
-                            }
-                        }
+                        AsyncImageHandler(subcomposeAsyncImageScope = this, boxSize = 64.dp)
                     }
                 }
                 Column(

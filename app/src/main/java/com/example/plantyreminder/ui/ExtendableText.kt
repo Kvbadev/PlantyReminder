@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
@@ -32,20 +33,22 @@ fun ExtendableText(
     val popupControl = remember { mutableStateOf(false) }
     val hasOverflow = remember { mutableStateOf(false) }
 
-    ClickableText(
-        text = AnnotatedString(text),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        onClick = {
-            popupControl.value = true
-        },
-        onTextLayout = {
-            if (it.hasVisualOverflow) hasOverflow.value = true
-        },
-        style = textStyle,
-        modifier = Modifier.then(modifier)
-    )
-    if (hasOverflow.value) OverflowPopup(popupControl = popupControl, text = text)
+    Box(modifier = Modifier.then(modifier)){
+        ClickableText(
+            text = AnnotatedString(text),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            onClick = {
+                popupControl.value = true
+            },
+            onTextLayout = {
+                if (it.hasVisualOverflow) hasOverflow.value = true
+            },
+            style = textStyle,
+            modifier = Modifier.align(Alignment.Center)
+        )
+        if (hasOverflow.value) OverflowPopup(popupControl = popupControl, text = text)
+    }
 }
 
 @Composable

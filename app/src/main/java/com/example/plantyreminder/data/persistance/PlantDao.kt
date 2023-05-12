@@ -11,6 +11,9 @@ interface PlantDao {
     @Query("SELECT * FROM plant WHERE uid IS :uid")
     suspend fun getPlant(uid: Long): Plant?
 
+    @Update
+    suspend fun update(plant: Plant)
+
     @Insert
     suspend fun insert(plant: Plant): Long
 

@@ -22,11 +22,6 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            val error = ErrorEntity.Default.Unknown
-            error.message = e.message.toString()
-
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }
 
@@ -39,8 +34,6 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }
 
@@ -53,8 +46,18 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
+        }
+    }
+
+    override suspend fun update(plant: Plant): SuspendedResult<Unit> {
+        return try {
+            val res = plantDao.update(plant)
+            SuspendedResult.Success(res)
+
+        } catch (e: SQLiteConstraintException) {
+            SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
+        } catch (e: SQLiteCantOpenDatabaseException) {
+            SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
         }
     }
 
@@ -66,8 +69,6 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }
 
@@ -80,8 +81,6 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }
 
@@ -94,8 +93,6 @@ class PlantsRoomRepository(
             SuspendedResult.Error(ErrorEntity.Database.ConstraintException)
         } catch (e: SQLiteCantOpenDatabaseException) {
             SuspendedResult.Error(ErrorEntity.Database.CantOpenException)
-        } catch (e: Exception) {
-            SuspendedResult.Error(ErrorEntity.Default.Unknown)
         }
     }
 }

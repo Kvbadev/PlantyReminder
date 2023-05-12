@@ -35,7 +35,7 @@ class ApiClient(
 
     suspend fun getAll(predicate: String = ""): SuspendedResult<List<PlantSearchResult>> {
         return try {
-            val data = apiInterface.getAll(predicate).results.mapNotNull {
+            val data = apiInterface.getAll(predicate).results.map {
                 it.toPlantSearchResult()
             }
             SuspendedResult.Success(data)

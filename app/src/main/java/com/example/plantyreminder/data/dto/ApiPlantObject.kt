@@ -96,5 +96,5 @@ data class ApiPlantObject (
     @SerializedName("description")
     var description: String? = null,
     @SerializedName("default_image")
-    val imageUrl: ApiResultImageUrl
+    val imageUrl: ApiResultImageUrl? = null
     )

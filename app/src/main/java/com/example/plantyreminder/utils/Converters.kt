@@ -21,13 +21,13 @@ class Converters {
         String.format("%s-%s-%s", value.dayOfMonth, value.monthValue, value.year)
 
     @TypeConverter
-    fun sunPreferenceFromString(preference: String?): List<SunPreference> {
+    fun sunPreferenceFromString(preference: String?): List<SunPreference>? {
         val listType = object : TypeToken<List<SunPreference>>() {}.type
         return gsonConverter.fromJson(preference, listType)
     }
 
     @TypeConverter
-    fun stringToListOfString(strings: String?): List<String> {
+    fun stringToListOfString(strings: String?): List<String>? {
         val listType = object : TypeToken<List<String>>() {}.type
         return gsonConverter.fromJson(strings, listType)
     }

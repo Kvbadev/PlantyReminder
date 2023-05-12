@@ -5,6 +5,7 @@ interface PlantsRepository {
     suspend fun getPlant(uid: Long): SuspendedResult<Plant?>
     suspend fun insertAll(plants: List<Plant>): SuspendedResult<Unit>
     suspend fun insert(plant: Plant): SuspendedResult<Long>
+    suspend fun update(plant: Plant): SuspendedResult<Unit>
     suspend fun delete(plant: Plant): SuspendedResult<Unit>
     suspend fun deleteAll(): SuspendedResult<Unit>
 }

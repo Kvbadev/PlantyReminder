@@ -15,7 +15,7 @@ data class Plant(
     @ColumnInfo("image_url") val imageUrl: String? = null,
     @ColumnInfo("indoor") val indoor: Boolean? = null,
     @ColumnInfo("created_at") val createdAt: LocalDate = LocalDate.now(),
-    @ColumnInfo("next_watering") val nextWatering: LocalDate = LocalDate.now(),
+    @ColumnInfo("next_watering") var nextWatering: LocalDate = LocalDate.now(),
     @ColumnInfo("family") val family: String? = null,
     @ColumnInfo("origin") val origin: List<String>? = null,
     @ColumnInfo("type") val type: String? = null,

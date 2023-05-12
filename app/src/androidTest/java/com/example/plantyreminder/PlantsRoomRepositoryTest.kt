@@ -9,10 +9,12 @@ import com.example.plantyreminder.data.persistance.PlantsRoomRepository
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SuspendedResult
+import com.google.gson.Gson
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
+import java.time.LocalDate
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
@@ -55,7 +57,7 @@ class PlantsRoomRepositoryTest {
         Assert.assertNull("Received value instead of null", plant.data)
 
         db.plantDao().insert(standalonePlant)
-        plant = repository.getPlant(standalonePlant.uid) as SuspendedResult.Success
+        plant = repository.getPlant(standalonePlant.uid) as SuspendedResult.Success<Plant?>
 
         Assert.assertEquals(
             "Received plant was not the same as the one inserted before",
@@ -130,6 +132,25 @@ class PlantsRoomRepositoryTest {
                 Assert.assertEquals(
                     "Did not receive empty list",
                     emptyList<Plant>(), db.plantDao().getAll()
+                )
+            }
+            else -> Assert.fail("Operation was not successful")
+        }
+    }
+
+    @Test
+    fun testUpdatePlant() = runTest {
+        db.plantDao().insert(standalonePlant)
+        val plant = standalonePlant
+        plant.nextWatering = LocalDate.now().plusDays(plant.waterSpan!!.getEstimatedTimespan())
+
+        when (repository.update(plant)) {
+            is SuspendedResult.Success -> {
+                val newPlant = db.plantDao().getPlant(standalonePlant.uid)
+
+                Assert.assertEquals(
+                    "Plant was not updated",
+                    plant.nextWatering, newPlant?.nextWatering
                 )
             }
             else -> Assert.fail("Operation was not successful")

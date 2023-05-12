@@ -9,27 +9,20 @@ import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
 class ApiSearchResultDeserializer : JsonDeserializer<ApiSearchResultObject> {
-    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): ApiSearchResultObject? {
-        val wrapperGson = Gson()
-        var image: ApiResultImageUrl?
-        if(json == null || context == null) throw Exception("json or context was null")
-        try {
-            image = context.deserialize<ApiResultImageUrl>(
-                json.asJsonObject["default_image"],
-                ApiResultImageUrl::class.java
-            )
-        } catch (e: com.google.gson.JsonSyntaxException) {
-            if(e.message.toString().contains("Expected BEGIN_OBJECT but was STRING")) {
-                return ApiSearchResultObject(
-                    json.asJsonObject["id"].asInt,
-                    json.asJsonObject["common_name"].asString,
-                    null, null, null
-                )
-            }
-            throw e
-        }
-        if(image?.url != null) return wrapperGson.fromJson(json, typeOfT)
+    override fun deserialize(
+        json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?
+    ): ApiSearchResultObject? {
+        if (json == null) throw Exception("JSON object was null")
+        val isPaywall = json.toString().contains("https://perenual.com/subscription-api-pricing")
 
-        return null
+        return if (!isPaywall) Gson().fromJson(
+            json.asJsonObject, ApiSearchResultObject::class.java
+        ) else ApiSearchResultObject(
+            json.asJsonObject["id"].asInt,
+            json.asJsonObject["common_name"].asString,
+            null,
+            null,
+            null
+        )
     }
 }

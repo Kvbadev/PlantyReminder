@@ -1,5 +1,7 @@
 package com.example.plantyreminder.utils
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 import com.example.plantyreminder.data.dto.ApiSearchResultObject
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.data.dto.ApiPlantObject
@@ -25,10 +27,12 @@ fun ApiPlantObject.toPlant() = Plant(
     description = description?.trim { it == '\n' } ?: "",
     waterSpan = PlantWateringSpan.fromText(watering?.lowercase() ?: "AVERAGE"),
     sunlight = sunlight.map { SunPreference.fromText(it) },
-    imageUrl = imageUrl.url,
+    imageUrl = imageUrl?.url,
     indoor = indoor,
     family = family,
     origin = origin,
     type = type,
     edible = edibleFruit
 )
+@Composable
+fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
