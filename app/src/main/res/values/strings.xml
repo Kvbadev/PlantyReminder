@@ -3,4 +3,6 @@
     <string name="error_unknown">Something unexpected\'s happened</string>
     <string name="search">Add plant</string>
     <string name="settings">Settings</string>
+    <string name="notification_reminder">Water your plants</string>
+    <string name="notification_reminder_desc">Take a moment to water your plants</string>
 </resources>

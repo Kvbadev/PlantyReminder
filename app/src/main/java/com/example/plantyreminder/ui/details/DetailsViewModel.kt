@@ -1,8 +1,11 @@
 package com.example.plantyreminder.ui.details
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.api.ApiClient
+import com.example.plantyreminder.data.notifications.Notification
+import com.example.plantyreminder.data.notifications.NotificationType
 import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -10,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class DetailsViewModel(
     private val apiClient: ApiClient,
-    private val plantsRepository: PlantsRepository
+    private val plantsRepository: PlantsRepository,
 ) : ViewModel() {
 
     private val plantDataState: DataState<Plant?> =
@@ -43,7 +46,9 @@ class DetailsViewModel(
         _operationEvent.emit(UiEvent.Loading)
         delay(2000L)
         when (val res = plantsRepository.insert(plant)) {
-            is SuspendedResult.Success -> _operationEvent.emit(UiEvent.Success)
+            is SuspendedResult.Success -> {
+                _operationEvent.emit(UiEvent.Success)
+            }
             is SuspendedResult.Error -> plantDataState.error.update { res.error }
         }
     }

@@ -4,6 +4,7 @@
 
 package com.example.plantyreminder.ui.home
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -105,7 +106,7 @@ fun PlantSlider(plants: List<Plant>) {
 
 
 @Composable
-fun PlantItem(plant: Plant, updatePlant: (Plant) -> Unit) {
+fun PlantItem(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -196,7 +197,7 @@ fun PlantItem(plant: Plant, updatePlant: (Plant) -> Unit) {
 }
 
 @Composable
-fun ItemNextWatering(plant: Plant, updatePlant: (Plant) -> Unit) {
+fun ItemNextWatering(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
     var daysToWatering by rememberSaveable {
         mutableStateOf(
             ChronoUnit.DAYS.between(
@@ -205,6 +206,7 @@ fun ItemNextWatering(plant: Plant, updatePlant: (Plant) -> Unit) {
             )
         )
     }
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -219,7 +221,7 @@ fun ItemNextWatering(plant: Plant, updatePlant: (Plant) -> Unit) {
                 if (newValue <= daysToWatering) return@clickable
                 daysToWatering = newValue
                 plant.nextWatering = plant.nextWatering.plusDays(newValue)
-                updatePlant(plant)
+                updatePlant(plant, context)
             },
         elevation = 8.dp
     ) {

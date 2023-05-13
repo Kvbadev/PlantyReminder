@@ -1,7 +1,11 @@
 package com.example.plantyreminder.ui.home
 
+import android.app.NotificationManager
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.plantyreminder.data.notifications.Notification
+import com.example.plantyreminder.data.notifications.NotificationType
 import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -58,11 +62,12 @@ class HomeViewModel(
         }
     }
 
-    fun updatePlant(plant: Plant) = viewModelScope.launch {
+    fun updatePlant(plant: Plant, context: Context) = viewModelScope.launch {
         _updatingEvent.emit(UiEvent.Loading)
         when (val res = repository.update(plant)) {
             is SuspendedResult.Success -> {
                 _updatingEvent.emit(UiEvent.Success)
+                Notification(NotificationType.Reminder, context, NotificationManager.IMPORTANCE_HIGH).show()
             }
             is SuspendedResult.Error -> {
                 dataState.error.update { res.error }
