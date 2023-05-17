@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -23,14 +25,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.UiEvent
+import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.ExtendableText
 import com.example.plantyreminder.ui.FullScreenLoader
 import com.example.plantyreminder.ui.home.SampleData
-import com.example.plantyreminder.ui.home.pxToDp
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -48,12 +51,12 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
     LaunchedEffect(Unit) {
         detailsViewModel.operationEvent.collectLatest {
             when (it) {
-                is UiEvent.Loading -> operationLoading = true
-                is UiEvent.Success -> {
+                UiEvent.Loading -> operationLoading = true
+                UiEvent.Success -> {
                     operationLoading = false
                     Toast.makeText(
                         context,
-                        "Plant with id ${it.id} has been added!",
+                        "A new plant has been added!",
                         Toast.LENGTH_LONG
                     ).show()
                     navigateBack()
@@ -65,7 +68,7 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         if (!loading) {
             PlantDetail(
-                plant = plant ?: throw Exception("Plant was null"),
+                plant = plant,
                 operationLoading
             ) {
                 detailsViewModel.addPlantToLibrary(
@@ -84,53 +87,74 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
 }
 
 @Composable
-fun PlantDetail(plant: Plant, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
-
+fun PlantDetail(plant: Plant?, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
+    val scroll = rememberScrollState()
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp, 0.dp),
+            .padding(10.dp, 0.dp)
+            .verticalScroll(scroll),
         verticalArrangement = Arrangement.SpaceAround
     ) {
-        Box(
-            modifier = Modifier
-                .height(320.dp)
-                .fillMaxWidth()
-                .padding(8.dp, 10.dp, 8.dp, 8.dp)
-        ) {
-            SubcomposeAsyncImage(
-                model = plant.imageUrl,
-                contentDescription = plant.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                loading = { CircularProgressIndicator() }
-            )
-        }
-        Column {
-            ExtendableText(
-                text = plant.name, textStyle = TextStyle(
-                    color = colorResource(id = R.color.green_700),
-                    fontSize = 32.sp,
+        if (plant == null) {
+            Column {
+                ExtendableText(
+                    text = "Plant Unavailable...", textStyle = TextStyle(
+                        color = colorResource(id = R.color.green_700),
+                        fontSize = 32.sp,
+                    )
                 )
-            )
-            Text(
-                text = if (plant.description != "") plant.description else "No Description",
-                color = colorResource(id = R.color.black),
-                fontSize = 16.sp,
-            )
+                Text(
+                    text = "Unfortunately, this plant is not available in the free version of Perenual Api. We recommend to choose a different plant or try in a few hours.",
+                    color = colorResource(id = R.color.black),
+                    fontSize = 16.sp,
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .height(320.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp, 10.dp, 8.dp, 8.dp)
+            ) {
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(plant.imageUrl)
+                        .build(),
+                    contentDescription = plant.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .align(Alignment.Center),
+                    contentScale = ContentScale.Crop
+                ) {
+                    AsyncImageHandler(subcomposeAsyncImageScope = this, boxSize = 128.dp)
+                }
+            }
+            Column {
+                ExtendableText(
+                    text = plant.name, textStyle = TextStyle(
+                        color = colorResource(id = R.color.green_700),
+                        fontSize = 32.sp,
+                    )
+                )
+                Spacer(Modifier.padding(8.dp))
+                Text(
+                    text = if (plant.description != "") plant.description else "No Description",
+                    color = colorResource(id = R.color.black),
+                    fontSize = 16.sp,
+                )
+            }
+            Spacer(Modifier.padding(8.dp))
+            PlantParameter(label = "Origin", value = plant.origin?.first())
+            PlantParameter(label = "Family", value = plant.family)
+            PlantParameter(label = "type", value = plant.type)
+            PlantParameter(label = "edible", value = (plant.edible ?: "N/A").toString())
+            AddToPlants(operationLoading, addPlantToSaved)
         }
-        Spacer(Modifier.padding(2.dp))
-        PlantParameter(label = "Origin", value = plant.origin?.first())
-        PlantParameter(label = "Family", value = plant.family)
-        PlantParameter(label = "type", value = plant.type)
-        PlantParameter(label = "edible", value = (plant.edible ?: "N/A").toString())
-        AddToPlants(operationLoading, addPlantToSaved)
+
     }
-
-
 }
 
 @Composable
@@ -141,7 +165,7 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(12.dp,8.dp,8.dp,8.dp)
             .height(40.dp),
     ) {
         Text(text = "Add to ", color = colorResource(id = R.color.black))
@@ -161,6 +185,7 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
             }
         }
     }
+
 }
 
 @Composable
@@ -178,16 +203,16 @@ fun PlantParameter(label: String, value: String?) {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.weight(1f))
-        Text(
-            text = value ?: "N/A",
-            color = colorResource(id = R.color.green_500),
-            fontSize = 20.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(3f),
-            textAlign = TextAlign.Center
+        ExtendableText(
+            text = value ?: "N/A", textStyle = TextStyle(
+                color = colorResource(id = R.color.green_500),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center
+            ),
+            modifier = Modifier.weight(3f)
         )
     }
+
 }
 
 @Composable

@@ -4,40 +4,46 @@
 
 package com.example.plantyreminder.ui.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import coil.compose.SubcomposeAsyncImage
+import coil.request.ImageRequest
 import com.example.plantyreminder.R
 import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.Plant
 import com.example.plantyreminder.domain.PlantWateringSpan
 import com.example.plantyreminder.domain.SunPreference
+import com.example.plantyreminder.domain.UiEvent
+import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.ExtendableText
+import com.example.plantyreminder.utils.pxToDp
+import kotlinx.coroutines.flow.collectLatest
+import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -45,6 +51,26 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
+    val viewModel: HomeViewModel = koinViewModel()
+    var updatingPlant by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.updatingEvent.collectLatest {
+            when (it) {
+                UiEvent.Loading -> updatingPlant = true
+                UiEvent.Success -> {
+                    updatingPlant = false
+                    Toast.makeText(
+                        context,
+                        "Plant updated!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
     if (plants.isEmpty()) {
         Column(
             Modifier.fillMaxHeight(),
@@ -68,19 +94,19 @@ fun PlantSlider(plants: List<Plant>) {
     } else {
         HorizontalPager(
             pageCount = plants.size,
-            contentPadding = PaddingValues(0.dp, 10.dp, 0.dp, 0.dp)
+            contentPadding = PaddingValues(0.dp, 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.9f)
         ) {
-            PlantItem(plant = plants[it])
+            PlantItem(plant = plants[it], viewModel::updatePlant)
         }
     }
 }
 
-@Composable
-fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
-
 
 @Composable
-fun PlantItem(plant: Plant) {
+fun PlantItem(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
@@ -88,29 +114,18 @@ fun PlantItem(plant: Plant) {
             .fillMaxWidth()
             .padding(16.dp, 0.dp)
     ) {
-        Box(
+        SubcomposeAsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(plant.imageUrl)
+                .build(),
+            contentDescription = plant.name,
             modifier = Modifier
-                .height(900.pxToDp())
                 .fillMaxWidth()
+                .height(900.pxToDp())
+                .clip(RoundedCornerShape(8.dp)),
+            contentScale = ContentScale.Crop
         ) {
-            SubcomposeAsyncImage(
-                model = plant.imageUrl,
-                contentDescription = plant.name,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                loading = {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(900.pxToDp())
-                    ) {
-                        CircularProgressIndicator(Modifier.size(64.dp).align(Alignment.Center))
-                    }
-                }
-            )
+            AsyncImageHandler(subcomposeAsyncImageScope = this, boxSize = 128.dp)
         }
         Column(
             horizontalAlignment = Alignment.Start,
@@ -118,7 +133,6 @@ fun PlantItem(plant: Plant) {
                 .fillMaxWidth()
                 .padding(0.dp, 10.dp)
         ) {
-
             ExtendableText(
                 text = plant.name,
                 textStyle = TextStyle(
@@ -145,46 +159,107 @@ fun PlantItem(plant: Plant) {
                 Modifier.weight(1f)
             )
             PlantItemMetric(
+                value = plant.sunlight,
+                label = "Sunlight",
+                Modifier.weight(2f)
+            )
+            PlantItemMetric(
                 value = plant.origin?.first(),
                 label = "Origin",
                 Modifier.weight(1f)
             )
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max),
+        ) {
             PlantItemMetric(
-                value = plant.sunlight,
-                label = "Sunlight",
+                value = if (plant.indoor == true) "Yes" else "No",
+                label = "Indoor",
+                Modifier.weight(1f)
+            )
+            PlantItemMetric(
+                value = plant.type,
+                label = "Type",
+                Modifier.weight(2f)
+            )
+            PlantItemMetric(
+                value = if (plant.edible == true) "Yes" else "No",
+                label = "Edible",
                 Modifier.weight(1f)
             )
         }
-        ItemNextWatering(ChronoUnit.DAYS.between(LocalDate.now(), plant.nextWatering))
+        Spacer(Modifier.padding(8.dp))
+        ItemNextWatering(plant, updatePlant)
     }
 }
 
 @Composable
-fun ItemNextWatering(daysToWatering: Long) {
-    Row(
+fun ItemNextWatering(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
+    var daysToWatering by rememberSaveable {
+        mutableStateOf(
+            ChronoUnit.DAYS.between(
+                LocalDate.now(),
+                plant.nextWatering
+            )
+        )
+    }
+    val context = LocalContext.current
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(0.dp, 16.dp)
-            .border(2.dp, colorResource(id = R.color.green_700), RoundedCornerShape(6.dp))
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Text(
-            text = "Next watering: ",
-            fontSize = 24.sp,
-        )
-        Text(
-            text = when {
-                daysToWatering > 0 -> "$daysToWatering days"
-                daysToWatering == 0L -> "Today"
-                else -> "${daysToWatering.absoluteValue} days ago!"
+            .clickable {
+                val newValue = ChronoUnit.DAYS.between(
+                    LocalDate.now(),
+                    LocalDate
+                        .now()
+                        .plusDays(plant.waterSpan?.getEstimatedTimespan() ?: 0L)
+                )
+                if (newValue <= daysToWatering) return@clickable
+                daysToWatering = newValue
+                plant.nextWatering = plant.nextWatering.plusDays(newValue)
+                updatePlant(plant, context)
             },
-            color = colorResource(id = if (daysToWatering > 0) R.color.blue_700 else R.color.red_500),
-            fontSize = 24.sp,
-            textAlign = TextAlign.End,
-        )
+        elevation = 8.dp
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+
+            Crossfade(
+                targetState = daysToWatering,
+                animationSpec = tween(1000)
+            ) {
+                Text(
+                    text = when {
+                        it > 0 -> "$daysToWatering days"
+                        it == 0L -> "Today"
+                        else -> "${it.absoluteValue} days ago!"
+                    },
+                    color = colorResource(
+                        id = when {
+                            it > 0 -> R.color.green_200
+                            it == 0L -> R.color.black
+                            else -> R.color.red_500
+                        }
+                    ),
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.End,
+                )
+            }
+            Image(
+                painter = painterResource(R.drawable.watering_can_icon),
+                contentDescription = "Next watering",
+                modifier = Modifier.size(128.dp)
+            )
+        }
     }
 }
 
@@ -214,7 +289,7 @@ inline fun <reified T> PlantItemMetric(
             ExtendableText(
                 text = value,
                 textStyle = TextStyle(
-                    fontSize = 24.sp,
+                    fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     color = colorResource(id = R.color.gray_700)
                 )

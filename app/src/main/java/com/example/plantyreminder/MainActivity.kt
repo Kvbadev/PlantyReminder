@@ -1,8 +1,15 @@
 package com.example.plantyreminder
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.core.app.NotificationCompat
 import com.example.plantyreminder.di.appModule
 import com.example.plantyreminder.ui.PlantyReminderApp
 import com.example.plantyreminder.ui.theme.PlantyReminderTheme

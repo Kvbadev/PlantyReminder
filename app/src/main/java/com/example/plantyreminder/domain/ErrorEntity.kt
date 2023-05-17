@@ -16,6 +16,8 @@ sealed interface ErrorEntity {
 
     enum class Network(override var message: String) : ErrorEntity {
         NoInternet("You have no internet connection"),
-        InvalidHttpResponse("Could not obtain information from the API")
+        InvalidHttpResponse("Could not obtain information from the API"),
+        UnknownAddress("The address you're trying to reach doesn't exist"),
+        ApiPaywall("Free Perenual API could not handle this request")
     }
 }

@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class DetailsViewModel(
     private val apiClient: ApiClient,
-    private val plantsRepository: PlantsRepository
+    private val plantsRepository: PlantsRepository,
 ) : ViewModel() {
 
     private val plantDataState: DataState<Plant?> =
@@ -28,20 +28,25 @@ class DetailsViewModel(
         viewModelScope.launch {
             when (val res = apiClient.getPlant(id)) {
                 is SuspendedResult.Success -> plantDataState.data.update { res.data }
-                is SuspendedResult.Error -> plantDataState.error.update { res.error }
+                is SuspendedResult.Error -> {
+                    if (res.error != ErrorEntity.Network.ApiPaywall)
+                        plantDataState.error.update {
+                            res.error
+                        }
+                }
             }
             plantDataState.loading.update { false }
         }
     }
 
-    fun addPlantToLibrary(plant: Plant) {
-        viewModelScope.launch {
-            _operationEvent.emit(UiEvent.Loading())
-            delay(2000L)
-            when (val res = plantsRepository.insert(plant)) {
-                is SuspendedResult.Success -> _operationEvent.emit(UiEvent.Success(res.data))
-                is SuspendedResult.Error -> plantDataState.error.update { res.error }
+    fun addPlantToLibrary(plant: Plant) = viewModelScope.launch {
+        _operationEvent.emit(UiEvent.Loading)
+        delay(2000L)
+        when (val res = plantsRepository.insert(plant)) {
+            is SuspendedResult.Success -> {
+                _operationEvent.emit(UiEvent.Success)
             }
+            is SuspendedResult.Error -> plantDataState.error.update { res.error }
         }
     }
 }

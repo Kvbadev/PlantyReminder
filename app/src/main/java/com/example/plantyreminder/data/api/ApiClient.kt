@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Converter
 import retrofit2.HttpException
 import retrofit2.Retrofit
+import java.net.UnknownHostException
 
 class ApiClient(
     private val baseUrl: String,
@@ -34,13 +35,16 @@ class ApiClient(
 
     suspend fun getAll(predicate: String = ""): SuspendedResult<List<PlantSearchResult>> {
         return try {
-            val data = apiInterface.getAll(predicate).results.mapNotNull {
+            val data = apiInterface.getAll(predicate).results.map {
                 it.toPlantSearchResult()
             }
             SuspendedResult.Success(data)
         } catch (e: HttpException) {
-//            Log.e("GetAll", e.message.toString())
             SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
+
+        }
+        catch (e: UnknownHostException) {
+            SuspendedResult.Error(ErrorEntity.Network.UnknownAddress)
         }
     }
 
@@ -49,6 +53,9 @@ class ApiClient(
             val data = apiInterface.getPlant(id).toPlant()
             SuspendedResult.Success(data)
         } catch (e: HttpException) {
+            if(e.response()?.code() == 429)
+                return SuspendedResult.Error(ErrorEntity.Network.ApiPaywall)
+
             Log.e("GetPlant", e.message.toString())
             SuspendedResult.Error(ErrorEntity.Network.InvalidHttpResponse)
         }
