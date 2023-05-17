@@ -1,11 +1,8 @@
 package com.example.plantyreminder.ui.details
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.api.ApiClient
-import com.example.plantyreminder.data.notifications.Notification
-import com.example.plantyreminder.data.notifications.NotificationType
 import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*

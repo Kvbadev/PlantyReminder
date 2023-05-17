@@ -4,7 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
@@ -86,12 +88,13 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
 
 @Composable
 fun PlantDetail(plant: Plant?, operationLoading: Boolean, addPlantToSaved: () -> Unit) {
-
+    val scroll = rememberScrollState()
     Column(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp, 0.dp),
+            .padding(10.dp, 0.dp)
+            .verticalScroll(scroll),
         verticalArrangement = Arrangement.SpaceAround
     ) {
         if (plant == null) {
@@ -136,13 +139,14 @@ fun PlantDetail(plant: Plant?, operationLoading: Boolean, addPlantToSaved: () ->
                         fontSize = 32.sp,
                     )
                 )
+                Spacer(Modifier.padding(8.dp))
                 Text(
                     text = if (plant.description != "") plant.description else "No Description",
                     color = colorResource(id = R.color.black),
                     fontSize = 16.sp,
                 )
             }
-            Spacer(Modifier.padding(2.dp))
+            Spacer(Modifier.padding(8.dp))
             PlantParameter(label = "Origin", value = plant.origin?.first())
             PlantParameter(label = "Family", value = plant.family)
             PlantParameter(label = "type", value = plant.type)
@@ -161,7 +165,7 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(12.dp,8.dp,8.dp,8.dp)
             .height(40.dp),
     ) {
         Text(text = "Add to ", color = colorResource(id = R.color.black))
