@@ -71,10 +71,10 @@ class HomeViewModel(
         _updatingEvent.emit(UiEvent.Loading)
         when (val res = repository.update(plant)) {
             is SuspendedResult.Success -> {
-                val nextWatering = SystemClock.elapsedRealtime() + (ChronoUnit.DAYS.between(
+                val nextWatering = Calendar.getInstance().timeInMillis + (ChronoUnit.DAYS.between(
                     LocalDate.now(),
                     plant.nextWatering
-                ) * 24 * 3600 * 1000)
+                ) * 86400000)
                 scheduleNotification(plant.name, nextWatering, context)
                 _updatingEvent.emit(UiEvent.Success)
             }

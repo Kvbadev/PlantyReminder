@@ -97,7 +97,6 @@ fun PlantSlider(plants: List<Plant>) {
             contentPadding = PaddingValues(0.dp, 10.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f)
         ) {
             PlantItem(plant = plants[it], viewModel::updatePlant)
         }
@@ -218,7 +217,7 @@ fun ItemNextWatering(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
                         .now()
                         .plusDays(plant.waterSpan?.getEstimatedTimespan() ?: 0L)
                 )
-                if (newValue <= daysToWatering) return@clickable
+//                if (newValue <= daysToWatering) return@clickable
                 daysToWatering = newValue
                 plant.nextWatering = plant.nextWatering.plusDays(newValue)
                 updatePlant(plant, context)
@@ -235,7 +234,7 @@ fun ItemNextWatering(plant: Plant, updatePlant: (Plant, Context) -> Unit) {
 
             Crossfade(
                 targetState = daysToWatering,
-                animationSpec = tween(1000)
+                animationSpec = tween(1000),
             ) {
                 Text(
                     text = when {
@@ -371,7 +370,7 @@ fun PlantSliderPreview() {
 @Preview(showBackground = true)
 @Composable
 fun PlantSliderPreviewEmpty() {
-    PlantSlider(plants = emptyList())
+    PlantItem(SampleData.plantsSample[0]) { _, _ ->}
 }
 
 object SampleData {
