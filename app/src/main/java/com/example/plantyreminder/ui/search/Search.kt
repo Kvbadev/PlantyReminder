@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,13 +24,15 @@ import androidx.compose.ui.unit.sp
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.PlantyScreen
+import com.example.plantyreminder.ui.navigation.TopBar
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 @Composable
 fun Search(
-    navigateTo: (String) -> Unit
+    navigateTo: (String) -> Unit,
+    openDrawer: () -> Unit
 ) {
     val searchViewModel: SearchViewModel = koinViewModel()
 
@@ -39,26 +42,17 @@ fun Search(
     val query = remember { searchViewModel.query }
 
     Column(Modifier.fillMaxSize()) {
+        TopBar(
+            buttonIcon = Icons.Filled.Menu,
+            title = "Search",
+            onButtonClicked = { openDrawer() }
+        )
         Row(
             Modifier
                 .fillMaxWidth()
                 .width(IntrinsicSize.Max)
                 .height(IntrinsicSize.Max)
         ) {
-            Box(
-                Modifier
-                    .clickable {
-                        navigateTo(PlantyScreen.Home.name)
-                    }
-                    .width(48.dp)
-                    .fillMaxHeight()) {
-                Icon(
-                    Icons.Filled.ArrowBack, "",
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(32.dp)
-                )
-            }
             SearchView(query, searchViewModel::getSearchResults)
         }
         if (loading) {

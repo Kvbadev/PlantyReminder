@@ -10,6 +10,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +35,15 @@ import com.example.plantyreminder.domain.UiEvent
 import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.ExtendableText
 import com.example.plantyreminder.ui.FullScreenLoader
+import com.example.plantyreminder.ui.PlantyScreen
 import com.example.plantyreminder.ui.home.SampleData
+import com.example.plantyreminder.ui.navigation.TopBar
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun Details(id: Int?, navigateBack: () -> Unit) {
+fun Details(id: Int?, navigateTo: (String) -> Unit) {
     val detailsViewModel: DetailsViewModel = getViewModel(parameters = { parametersOf(id) })
 
     val plant by detailsViewModel.plant.collectAsState()
@@ -59,13 +63,19 @@ fun Details(id: Int?, navigateBack: () -> Unit) {
                         "A new plant has been added!",
                         Toast.LENGTH_LONG
                     ).show()
-                    navigateBack()
+                    navigateTo(PlantyScreen.Home.name)
                 }
             }
         }
     }
 
+
     Column(Modifier.fillMaxSize()) {
+        TopBar(
+            buttonIcon = Icons.Filled.ArrowBack,
+            title = plant?.name ?: "...",
+            onButtonClicked = { navigateTo(PlantyScreen.Search.name) }
+        )
         if (!loading) {
             PlantDetail(
                 plant = plant,
@@ -165,7 +175,7 @@ fun AddToPlants(operationLoading: Boolean, addPlantToSaved: () -> Unit) {
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp,8.dp,8.dp,8.dp)
+            .padding(12.dp, 8.dp, 8.dp, 8.dp)
             .height(40.dp),
     ) {
         Text(text = "Add to ", color = colorResource(id = R.color.black))

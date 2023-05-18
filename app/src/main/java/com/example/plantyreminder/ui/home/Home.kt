@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,10 +19,10 @@ import com.example.plantyreminder.MainActivity
 import org.koin.androidx.compose.getViewModel
 import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.FullScreenLoader
+import com.example.plantyreminder.ui.navigation.TopBar
 
 @Composable
-fun Home(onNavigateToSearch: () -> Unit) {
-    AddPlant(onNavigateToSearch)
+fun Home(openDrawer: () -> Unit) {
     val homeViewModel = getViewModel<HomeViewModel>()
 
     val plants by homeViewModel.results.collectAsState()
@@ -31,38 +32,25 @@ fun Home(onNavigateToSearch: () -> Unit) {
     Surface(
         Modifier.fillMaxSize()
     ) {
-        Scaffold(
-            floatingActionButton = { AddPlant(onNavigateToSearch) },
-            isFloatingActionButtonDocked = true
-        ) { padding ->
-            Column(Modifier.padding(padding)) {
-                if (!loading) {
-                    PlantSlider(plants)
+        Column {
+            TopBar(
+                buttonIcon = Icons.Filled.Menu,
+                title = "Home",
+                onButtonClicked = { openDrawer() }
+            )
+            if (!loading) {
+                PlantSlider(plants)
 
-                } else FullScreenLoader()
+            } else FullScreenLoader()
 
-                if (error != null && MainActivity.isActivityVisible) {
-                    Toast.makeText(
-                        LocalContext.current,
-                        error!!.message,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
+            if (error != null && MainActivity.isActivityVisible) {
+                Toast.makeText(
+                    LocalContext.current,
+                    error!!.message,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
-    }
-}
-
-@Composable
-fun AddPlant(navigateToSearch: () -> Unit) {
-    FloatingActionButton(
-        onClick = {
-            navigateToSearch()
-        },
-        backgroundColor = colorResource(id = R.color.green_700),
-        contentColor = colorResource(id = R.color.white)
-    ) {
-        Icon(Icons.Filled.Add, "")
     }
 }
 
