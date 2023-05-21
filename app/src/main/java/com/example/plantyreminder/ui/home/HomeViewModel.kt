@@ -4,32 +4,35 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.notifications.AppNotification
 import com.example.plantyreminder.domain.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
+import javax.inject.Inject
 
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel @Inject constructor(
     private val repository: PlantsRepository,
 ) : ViewModel() {
 
-    private val dataState: DataState<List<Plant>> =
-        DataState(data = MutableStateFlow(emptyList()))
+    private val dataState: DataState<List<Plant>> = DataState(data = MutableStateFlow(emptyList()))
     private val _updatingEvent: MutableSharedFlow<UiEvent> = MutableSharedFlow()
-
+    init {
+        updateUserPlants()
+    }
     var loadingState = dataState.loading.asStateFlow()
     val results = dataState.data.asStateFlow()
     val errorState = dataState.error.asStateFlow()
 
     val updatingEvent = _updatingEvent.asSharedFlow()
 
-    internal fun updateUserPlants() {
+    private fun updateUserPlants() {
         dataState.loading.update { true }
         viewModelScope.launch {
             when (val res = repository.getAll()) {
@@ -72,8 +75,7 @@ class HomeViewModel(
         when (val res = repository.update(plant)) {
             is SuspendedResult.Success -> {
                 val nextWatering = Calendar.getInstance().timeInMillis + (ChronoUnit.DAYS.between(
-                    LocalDate.now(),
-                    plant.nextWatering
+                    LocalDate.now(), plant.nextWatering
                 ) * 86400000)
                 scheduleNotification(plant.name, nextWatering, context)
                 _updatingEvent.emit(UiEvent.Success)
@@ -89,16 +91,11 @@ class HomeViewModel(
         val intent = Intent(context, AppNotification::class.java)
         intent.putExtra("content", "Your $plantName need some water!")
         val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            1,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         alarmManager.setAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            delay,
-            pendingIntent
+            AlarmManager.RTC_WAKEUP, delay, pendingIntent
         )
     }
 }

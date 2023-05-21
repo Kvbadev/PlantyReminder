@@ -9,10 +9,13 @@ import com.example.plantyreminder.data.PlantSearchResult
 import com.example.plantyreminder.domain.DataState
 import com.example.plantyreminder.domain.SuspendedResult
 import com.example.plantyreminder.utils.debounce
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel(
+@HiltViewModel
+class SearchViewModel @Inject constructor(
     private val apiClient: ApiClient,
 ) : ViewModel() {
     private val dataState: DataState<List<PlantSearchResult>> =

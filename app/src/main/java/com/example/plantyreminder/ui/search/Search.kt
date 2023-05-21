@@ -2,12 +2,10 @@ package com.example.plantyreminder.ui.search
 
 import android.widget.Toast
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
@@ -21,12 +19,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.plantyreminder.MainActivity
 import com.example.plantyreminder.R
-import com.example.plantyreminder.ui.PlantyScreen
 import com.example.plantyreminder.ui.navigation.TopBar
-import org.koin.androidx.compose.koinViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 @Composable
@@ -34,7 +30,7 @@ fun Search(
     navigateTo: (String) -> Unit,
     openDrawer: () -> Unit
 ) {
-    val searchViewModel: SearchViewModel = koinViewModel()
+    val searchViewModel: SearchViewModel = hiltViewModel()
 
     val results by searchViewModel.results.collectAsState()
     val errorState by searchViewModel.errorState.collectAsState()

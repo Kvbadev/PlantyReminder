@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.example.plantyreminder.R
@@ -43,7 +44,6 @@ import com.example.plantyreminder.ui.AsyncImageHandler
 import com.example.plantyreminder.ui.ExtendableText
 import com.example.plantyreminder.utils.pxToDp
 import kotlinx.coroutines.flow.collectLatest
-import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -51,7 +51,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun PlantSlider(plants: List<Plant>) {
-    val viewModel: HomeViewModel = koinViewModel()
+    val viewModel: HomeViewModel = hiltViewModel()
     var updatingPlant by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
