@@ -1,17 +1,28 @@
 package com.example.plantyreminder.ui.details
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.plantyreminder.data.api.ApiClient
 import com.example.plantyreminder.domain.*
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailsViewModel(
+@HiltViewModel
+class DetailsViewModel @Inject constructor(
     private val apiClient: ApiClient,
     private val plantsRepository: PlantsRepository,
 ) : ViewModel() {
+    var plantId: Int? = null
+        set(value) {
+            if(field == null) field = value
+        }
 
     private val plantDataState: DataState<Plant?> =
         DataState(data = MutableStateFlow(null))
@@ -23,10 +34,10 @@ class DetailsViewModel(
 
     val operationEvent = _operationEvent.asSharedFlow()
 
-    fun getDetailedPlant(id: Int) {
+    fun getDetailedPlant() {
         plantDataState.loading.update { true }
         viewModelScope.launch {
-            when (val res = apiClient.getPlant(id)) {
+            when (val res = apiClient.getPlant(plantId!!)) {
                 is SuspendedResult.Success -> plantDataState.data.update { res.data }
                 is SuspendedResult.Error -> {
                     if (res.error != ErrorEntity.Network.ApiPaywall)

@@ -5,13 +5,11 @@ import android.database.sqlite.SQLiteCantOpenDatabaseException
 import android.database.sqlite.SQLiteConstraintException
 import com.example.plantyreminder.domain.*
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
-class PlantsRoomRepository(
-    context: Context,
-    private val database: PlantDatabase = PlantDatabase.getInstance(context),
-    private val plantDao: PlantDao = database.plantDao()
+class PlantsRoomRepository @Inject constructor(
+    private val plantDao: PlantDao
 ) : PlantsRepository {
-
     override suspend fun getAll(): SuspendedResult<List<Plant>> {
         val data: List<Plant>
         return try {

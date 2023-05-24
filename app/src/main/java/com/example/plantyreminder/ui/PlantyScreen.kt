@@ -1,27 +1,16 @@
 package com.example.plantyreminder.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.ModalDrawer
+import androidx.compose.material.Surface
+import androidx.compose.material.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,15 +19,16 @@ import androidx.navigation.navArgument
 import com.example.plantyreminder.R
 import com.example.plantyreminder.ui.details.Details
 import com.example.plantyreminder.ui.home.Home
+import com.example.plantyreminder.ui.home.HomeViewModel
 import com.example.plantyreminder.ui.navigation.Drawer
 import com.example.plantyreminder.ui.search.Search
+import com.example.plantyreminder.ui.search.SearchViewModel
 import com.example.plantyreminder.ui.settings.Settings
 import kotlinx.coroutines.launch
 
 enum class PlantyScreen {
     Home, Search, Details, Settings
 }
-
 
 @Composable
 fun PlantyReminderApp() {
@@ -72,29 +62,33 @@ fun PlantyReminderApp() {
                     })
             }
         ) {
-
+            val searchViewModel = hiltViewModel<SearchViewModel>()
             NavHost(
                 navController = navController,
                 startDestination = PlantyScreen.Home.name,
             ) {
                 composable(PlantyScreen.Home.name) {
+                    val homeViewModel = hiltViewModel<HomeViewModel>()
                     Home(
-                        openDrawer = { openDrawer() }
+                        openDrawer = { openDrawer() },
+                        homeViewModel = homeViewModel
                     )
                 }
                 composable(PlantyScreen.Search.name) {
+
                     Search(
                         navigateTo = { route ->
                             navController.navigate(route)
                         },
-                        openDrawer = { openDrawer() }
+                        openDrawer = { openDrawer() },
+                        searchViewModel = searchViewModel
                     )
                 }
                 composable(
                     "${PlantyScreen.Details.name}/{plantId}",
                     arguments = listOf(navArgument("plantId") { type = NavType.IntType })
                 ) {
-                    val id = it.arguments?.getInt("plantId")
+                    val id = it.arguments?.getInt("plantId") ?: return@composable
                     Details(
                         id,
                         navigateTo = {route -> navController.navigate(route)}

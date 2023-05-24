@@ -6,4 +6,9 @@
     <string name="notification_reminder">Water your plants</string>
     <string name="notification_reminder_desc">Take a moment to water your plants</string>
     <string name="notification_reminder_channel">reminder</string>
+    <string-array name="sort_options">
+        <item>Relevance</item>
+        <item>A-Z</item>
+        <item>Z-A</item>
+    </string-array>
 </resources>
