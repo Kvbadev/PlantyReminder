@@ -22,13 +22,13 @@ import com.example.plantyreminder.ui.home.Home
 import com.example.plantyreminder.ui.home.HomeViewModel
 import com.example.plantyreminder.ui.navigation.Drawer
 import com.example.plantyreminder.ui.search.Search
+import com.example.plantyreminder.ui.search.SearchViewModel
 import com.example.plantyreminder.ui.settings.Settings
 import kotlinx.coroutines.launch
 
 enum class PlantyScreen {
     Home, Search, Details, Settings
 }
-
 
 @Composable
 fun PlantyReminderApp() {
@@ -62,7 +62,7 @@ fun PlantyReminderApp() {
                     })
             }
         ) {
-
+            val searchViewModel = hiltViewModel<SearchViewModel>()
             NavHost(
                 navController = navController,
                 startDestination = PlantyScreen.Home.name,
@@ -75,11 +75,13 @@ fun PlantyReminderApp() {
                     )
                 }
                 composable(PlantyScreen.Search.name) {
+
                     Search(
                         navigateTo = { route ->
                             navController.navigate(route)
                         },
-                        openDrawer = { openDrawer() }
+                        openDrawer = { openDrawer() },
+                        searchViewModel = searchViewModel
                     )
                 }
                 composable(
